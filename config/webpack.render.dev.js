@@ -1,32 +1,26 @@
 const path = require('path')
 const webpack = require('webpack')
+const { merge } = require('webpack-merge')
+const baseConfig = require('./webpack.base')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const devServer = {
+  hot: true,
   contentBase: path.join(__dirname, '../dist'),
 }
 
-module.exports = {
+module.exports = merge(baseConfig, {
   mode: "development",
   devServer,
   devtool: 'inline-source-map',
-  entry: path.resolve(__dirname, '../src/renderer/index.ts'),
+  target: 'electron-renderer',
+  entry: path.resolve(__dirname, '../src/render/index.ts'),
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, '../dist'),
   },
   module: {
     rules: [
-      {
-        test: /\.m?[tj]sx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript']
-          }
-        }
-      },
       {
         test: /\.less$/i,
         exclude: /node_modules/,
@@ -49,13 +43,16 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader'
       }
     ]
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, '../src/renderer/index.html'),
-    })
+      template: path.resolve(__dirname, '../src/render/index.html'),
+    }),
   ],
-}
+})

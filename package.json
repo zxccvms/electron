@@ -3,17 +3,26 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "build-render": "webpack --config ./config/webpack.render.dev.js",
-    "start-render": "webpack-dev-server --config ./config/webpack.render.dev.js"
+    "build-main": "cross-env NODE_ENV=development webpack --config ./config/webpack.main.dev.js",
+    "build-render": "cross-env NODE_ENV=development webpack --config ./config/webpack.render.dev.js",
+    "start-main": "cross-env NODE_ENV=development webpack --config ./config/webpack.main.dev.js && electron ./dist/main.js",
+    "start-render": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.render.dev.js"
   },
   "dependencies": {
     "@babel/cli": "^7.13.14",
     "@babel/core": "^7.13.14",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-decorators": "^7.13.5",
     "@babel/preset-env": "^7.13.12",
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.13.0",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
     "babel-loader": "^8.2.2",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.2.0",
+    "electron": "^12.0.2",
+    "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.1",
     "less": "^4.1.1",
     "less-loader": "^8.0.0",
@@ -25,6 +34,8 @@
     "style-loader": "^2.0.0",
     "webpack": "^5.31.0",
     "webpack-cli": "3.3.12",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.7.3",
+    "webpack-node-externals": "^2.5.2"
   }
 }

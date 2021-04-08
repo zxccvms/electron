@@ -1,6 +1,28 @@
 {
   "compilerOptions": {
-    "jsx": "react"
+    "experimentalDecorators": true,
+    "target": "ES2018",
+    "module": "CommonJS",
+    "lib": ["dom", "esnext"],
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react",
+    "strict": false,
+    "pretty": true,
+    "sourceMap": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "src": ["src/*"]
+    }
   },
-  "strict": false
+  "exclude": ["node_modules", "resources"],
+  "include": ["src"]
 }
