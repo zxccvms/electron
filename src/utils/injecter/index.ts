@@ -1,7 +1,7 @@
-// import { remote } from 'electron';
-import { capitalizeTheFirstLetter } from "src/render/utils/js-help/string";
+import { capitalizeTheFirstLetter } from "src/utils/js-help/string";
+import remoteCallService from "src/utils/electron-help/RemoteCallService";
 
-// const currentWindow = remote.getCurrentWindow();
+const currentWindowName = remoteCallService.currentWindowName;
 
 /**服务实例映射表 */
 const entitesMap = new Map();
@@ -58,9 +58,9 @@ export function useLocalService(serviceName: string) {
  */
 export function useRemoteService(
   serviceName: string,
-  windowName: string = "main"
+  windowName: string = currentWindowName
 ) {
-  // todo
+  return remoteCallService.useRemoteService(serviceName, windowName);
 }
 
 /**
@@ -68,10 +68,15 @@ export function useRemoteService(
  * @param serviceName 服务名
  * @param windowName 窗口名
  */
-export function useService(serviceName: string, windowName: string = "main") {
-  // if (currentWindow.title === windowName) {
-  return useLocalService(serviceName);
-  // }
+export function useService<T>(
+  serviceName: string,
+  windowName: string = currentWindowName
+): T {
+  if (currentWindowName === windowName) {
+    return useLocalService(serviceName);
+  } else {
+    return useRemoteService(serviceName, windowName);
+  }
 }
 
 /**
@@ -89,14 +94,18 @@ export function injectable(serviceName: string = "") {
  * 注：依赖的服务请在_construction中使用
  * 注：相互依赖、先实例化的服务的construction中请异步使用依赖的服务
  */
-export function inject(target: string = "") {
+export function inject(
+  serviceName: string = "",
+  windowName: string = currentWindowName
+) {
   return (_, attrName: string, descriptor?) => {
-    const injectServiceName = capitalizeTheFirstLetter(attrName);
+    serviceName = serviceName || capitalizeTheFirstLetter(attrName);
 
     descriptor.initializer = function () {
       return new Proxy(Object.create(null), {
         get(_, key) {
-          const injectEntites = useService(target ? target : injectServiceName);
+          const injectEntites = useService(serviceName, windowName);
+
           return injectEntites[key];
         },
       });

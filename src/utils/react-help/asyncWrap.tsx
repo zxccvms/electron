@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { useService } from "src/render/utils/injecter";
+import { useService } from "src/utils/injecter";
 
 function wrapPromise(promise) {
   let status = "pending";

@@ -1,5 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
+import "./services";
+import { useService } from "src/utils/injecter";
 
 // 创建窗口
 function ceateWindow(title: string) {
@@ -10,6 +12,7 @@ function ceateWindow(title: string) {
     webPreferences: {
       nodeIntegration: true, // 允许渲染进程中使用node模块
       contextIsolation: false,
+      enableRemoteModule: true, // 允许渲染进程中使用remote模块
     },
   });
 
@@ -23,4 +26,6 @@ function ceateWindow(title: string) {
 
 app.on("ready", () => {
   ceateWindow("main");
+  ceateWindow("child");
+  useService("MainTestService");
 });

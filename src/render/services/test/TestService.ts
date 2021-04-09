@@ -1,21 +1,27 @@
-import { inject, injectable } from "src/render/utils/injecter";
+import { inject, injectable } from "src/utils/injecter";
 import Test2Service from "src/render/services/test2/Test2Service";
+import { MainTestService } from "src/main/services";
+import { BehaviorSubject } from "rxjs";
 
 @injectable()
 class TestService {
-  @inject() test2Service: Test2Service;
+  @inject("Test2Service") test2Service: Test2Service;
+  @inject("MainTestService", "MAIN_PROCESS") mainTestService: MainTestService;
+  $printHistory: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
   private _constructor() {
-    this.test2Service.print("init TestService");
+    this.test2Service.print("init Test2Service");
+    this.mainTestService.$printHistory.subscribe((history) => {
+      console.log("main history", history);
+    });
   }
 
   print(content: string) {
+    const printHistory = this.$printHistory.getValue();
+    printHistory.push(content);
+    this.$printHistory.next(printHistory);
     console.log("TestService print: ", content);
-    this.test2Service.print(content);
-  }
-
-  print2(content: string) {
-    console.log("TestService print2: ", content);
+    this.mainTestService.print(content);
   }
 }
 
