@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import "./services";
-import { useService } from "src/utils/injecter";
+import { useService } from "src/base/injecter";
 
 // 创建窗口
 function ceateWindow(title: string) {
@@ -25,7 +25,8 @@ function ceateWindow(title: string) {
 }
 
 app.on("ready", () => {
-  ceateWindow("main");
-  ceateWindow("child");
+  useService("BabelService");
   useService("MainTestService");
+  ceateWindow("main");
+  // ceateWindow("child");
 });

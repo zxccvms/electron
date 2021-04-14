@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-// import { useAsyncService } from "src/utils/react-help/asyncWrap";
 import { TestService } from "src/render/services";
 import { MainTestService } from "src/main/services";
-import { useService } from "src/utils/injecter";
+import { useService } from "src/base/injecter";
+import { MAIN_PROCESS } from "src/base/const";
 
 const testService = useService<TestService>("TestService", "child");
 const mainTestService = useService<MainTestService>(
   "MainTestService",
-  "MAIN_PROCESS"
+  MAIN_PROCESS
 );
 
 const Home = () => {

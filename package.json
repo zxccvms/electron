@@ -6,7 +6,8 @@
     "build-main": "cross-env NODE_ENV=development webpack --config ./config/webpack.main.dev.js",
     "build-render": "cross-env NODE_ENV=development webpack --config ./config/webpack.render.dev.js",
     "start-main": "cross-env NODE_ENV=development webpack --config ./config/webpack.main.dev.js && electron ./dist/main.js",
-    "start-render": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.render.dev.js"
+    "start-render": "cross-env NODE_ENV=development webpack-dev-server --config ./config/webpack.render.dev.js",
+    "encrypt": "node ./internals/scripts/encrypt.js"
   },
   "dependencies": {
     "@babel/cli": "^7.13.14",

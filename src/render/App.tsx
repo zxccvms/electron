@@ -2,11 +2,12 @@ import React from "react";
 import ReactDom from "react-dom";
 
 import Home from "./pages/home";
+import Extension from "./pages/extension";
 
 const App = (props) => {
   return (
     <div>
-      <Home />
+      <Extension />
     </div>
   );
 };

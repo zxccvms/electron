@@ -1,4 +1,4 @@
-import { inject, injectable } from "src/utils/injecter";
+import { inject, injectable } from "src/base/injecter";
 import Test2Service from "src/render/services/test2/Test2Service";
 import { MainTestService } from "src/main/services";
 import { BehaviorSubject } from "rxjs";

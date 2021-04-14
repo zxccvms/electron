@@ -1,12 +1,12 @@
-import { injectable, inject } from "src/utils/injecter";
+import { injectable, inject } from "src/base/injecter";
 import TestService from "src/render/services/test/TestService";
 
-@injectable()
+@injectable("Test2Service")
 class Test2Service {
-  @inject() testService: TestService;
+  // @inject() testService: TestService;
 
   private _constructor() {
-    this.testService.print("init Test2Service");
+    // this.testService.print("init Test2Service");
   }
 
   print(content: string) {

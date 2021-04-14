@@ -1,4 +1,4 @@
-import { injectable } from "src/utils/injecter";
+import { injectable } from "src/base/injecter";
 import { BehaviorSubject } from "rxjs";
 
 @injectable()

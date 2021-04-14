@@ -1,5 +1,5 @@
-import { capitalizeTheFirstLetter } from "src/utils/js-help/string";
-import remoteCallService from "src/utils/electron-help/RemoteCallService";
+import { capitalizeTheFirstLetter } from "src/base/js-help/string";
+import remoteCallService from "src/base/electron-help/RemoteCallService";
 
 const currentWindowName = remoteCallService.currentWindowName;
 
