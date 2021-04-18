@@ -1,5 +1,16 @@
 import { capitalizeTheFirstLetter } from "src/base/js-help/string";
 import remoteCallService from "src/base/electron-help/RemoteCallService";
+import { Subject } from "rxjs";
+
+type TFilter<U, T> = {
+  [P in keyof U]: U[P] extends T ? P : never;
+}[keyof U];
+
+export type TRemoteService<T> = {
+  [P in TFilter<T, Function | Subject<any>>]: T[P] extends Function
+    ? (...args: Parameters<T[P]>) => Promise<ReturnType<T[P]>>
+    : T[P];
+};
 
 const currentWindowName = remoteCallService.currentWindowName;
 
@@ -12,7 +23,7 @@ const ServiceMap = new Map();
  * 服务实例化
  * @param serviceName 服务名
  */
-function instantiation(serviceName) {
+function instantiation(serviceName: string) {
   console.info("instantiation ", serviceName);
   const Service = ServiceMap.get(serviceName);
   if (!Service) {
@@ -46,7 +57,7 @@ function getLocalEntites(serviceName: string) {
  * 使用本地服务
  * @param serviceName 服务名
  */
-export function useLocalService(serviceName: string) {
+export function useLocalService<T>(serviceName: string): T {
   const entites = getLocalEntites(serviceName);
   return entites;
 }
@@ -56,10 +67,10 @@ export function useLocalService(serviceName: string) {
  * @param serviceName 服务名
  * @param windowName 窗口名
  */
-export function useRemoteService(
+export function useRemoteService<T>(
   serviceName: string,
   windowName: string = currentWindowName
-) {
+): TRemoteService<T> {
   return remoteCallService.useRemoteService(serviceName, windowName);
 }
 
@@ -71,7 +82,7 @@ export function useRemoteService(
 export function useService<T>(
   serviceName: string,
   windowName: string = currentWindowName
-): T {
+): T | TRemoteService<T> {
   if (currentWindowName === windowName) {
     return useLocalService(serviceName);
   } else {

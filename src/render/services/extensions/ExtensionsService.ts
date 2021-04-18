@@ -1,4 +1,4 @@
-import { injectable, inject } from "src/base/injecter";
+import { injectable, inject, TRemoteService } from "src/base/injecter";
 import fs from "fs";
 import { MAIN_PROCESS, TRemoteService } from "src/base/const";
 import { BabelService } from "src/main/services";
