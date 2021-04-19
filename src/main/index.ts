@@ -26,7 +26,6 @@ function ceateWindow(title: string) {
 
 app.on("ready", () => {
   useService("BabelService");
-  useService("MainTestService");
   ceateWindow("main");
   // ceateWindow("child");
 });

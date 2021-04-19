@@ -1,6 +1,6 @@
-import { ipcMain, ipcRenderer, remote } from "electron";
+import { BrowserWindow, ipcMain, ipcRenderer, remote } from "electron";
 import { BehaviorSubject, Subject } from "rxjs";
-import { getWindowsByName } from "src/base/electron-help";
+import { getWindowsByName, hasWindowName } from "src/base/electron-help";
 import { randomString } from "src/base/js-help/string";
 import { useLocalService } from "src/base/injecter";
 import { MAIN_PROCESS } from "src/base/const";
@@ -34,9 +34,9 @@ export type TRemoteCallData = {
 
 /** 调用主进程或渲染进程(其他窗口)的服务 */
 class RemoteCallService {
+  currentWindowName: string;
   private _remoteServiceMap = new Map();
   private _attrWindowNamesMap: Map<string, string[]> = new Map();
-  currentWindowName: string;
   private _ipc: Electron.IpcRenderer | Electron.IpcMain;
 
   constructor() {
@@ -92,33 +92,35 @@ class RemoteCallService {
     const service = useLocalService(serviceName);
     const subject = service[key] as Subject<any>;
 
-    // BehaviorSubject类型需要补偿一次数据
-    if (subject instanceof BehaviorSubject) {
-      const data = subject.getValue();
-
-      this.sendMessageWrap(source, ERemoteCallAction.sendData, {
-        serviceName,
-        key,
-        data,
-      });
-    }
-
     // 此属性被调用且此窗口名已在列表内
-    if (windowNames.length && windowNames.indexOf(source) !== -1) return;
+    if (windowNames.length && windowNames.indexOf(source) !== -1) {
+      // BehaviorSubject类型需要补偿一次数据
+      if (subject instanceof BehaviorSubject) {
+        const data = subject.getValue();
+
+        this.sendMessageWrap(source, ERemoteCallAction.sendData, {
+          serviceName,
+          key,
+          data,
+        });
+      }
+
+      return;
+    }
 
     windowNames.push(source);
 
     if (windowNames.length === 1) {
       // 数组长度为1时需调用subscribe
       const subscription = subject.subscribe((data) => {
-        let i = 0;
         // 过滤不存在的窗口
+        let i = 0;
         while (windowNames[i]) {
-          if (getWindowsByName(windowNames[i]).length) i++;
+          if (hasWindowName(windowNames[i])) i++;
           else windowNames.splice(i, 1);
         }
         // 需要此属性的窗口为空
-        if (windowNames.length === 0) return subscription.unsubscribe();
+        if (!windowNames.length) return subscription.unsubscribe();
 
         for (const windowName of windowNames) {
           this.sendMessageWrap(windowName, ERemoteCallAction.sendData, {
@@ -201,13 +203,9 @@ class RemoteCallService {
     return result;
   }
 
-  /** 调用主进程或渲染进程(其他窗口)的服务 */
-  useRemoteService(serviceName: string, windowName: string) {
-    const key = `${windowName}-${serviceName}`;
-    const service = this._remoteServiceMap.get(key);
-    if (service) return service;
-
-    const proxy = new Proxy(Object.create(null), {
+  /** 生成代理的服务对象 */
+  private createProxyService(serviceName: string, windowName: string) {
+    return new Proxy(Object.create(null), {
       get: (obj, key) => {
         if (obj[key]) return obj[key];
 
@@ -237,7 +235,15 @@ class RemoteCallService {
         return obj[key];
       },
     });
+  }
 
+  /** 调用主进程或渲染进程(其他窗口)的服务 */
+  useRemoteService(serviceName: string, windowName: string) {
+    const key = `${windowName}-${serviceName}`;
+    const service = this._remoteServiceMap.get(key);
+    if (service) return service;
+
+    const proxy = this.createProxyService(serviceName, windowName);
     this._remoteServiceMap.set(key, proxy);
 
     return proxy;
@@ -245,7 +251,7 @@ class RemoteCallService {
 }
 
 /** 自定义的BehaviorSubject当值是 "!@#$%^&*()" 时不触发subscribe的回调*/
-export class CustomBehaviorSubject<T> extends BehaviorSubject<T> {
+class CustomBehaviorSubject<T> extends BehaviorSubject<T> {
   subscribe(cb) {
     if (cb instanceof Function) {
       const _cb = cb;

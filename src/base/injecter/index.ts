@@ -1,18 +1,14 @@
 import { capitalizeTheFirstLetter } from "src/base/js-help/string";
 import remoteCallService from "src/base/electron-help/RemoteCallService";
 import { Subject } from "rxjs";
-
-type TFilter<U, T> = {
-  [P in keyof U]: U[P] extends T ? P : never;
-}[keyof U];
-
-export type TRemoteService<T> = {
-  [P in TFilter<T, Function | Subject<any>>]: T[P] extends Function
-    ? (...args: Parameters<T[P]>) => Promise<ReturnType<T[P]>>
-    : T[P];
-};
+import { MAIN_PROCESS } from "src/base/const";
 
 const currentWindowName = remoteCallService.currentWindowName;
+
+// 在渲染进程的window对象上挂载useService方法
+if (currentWindowName !== MAIN_PROCESS) {
+  window.__useService = useService;
+}
 
 /**服务实例映射表 */
 const entitesMap = new Map();
@@ -61,6 +57,16 @@ export function useLocalService<T>(serviceName: string): T {
   const entites = getLocalEntites(serviceName);
   return entites;
 }
+
+type TFilter<U, T> = {
+  [P in keyof U]: U[P] extends T ? P : never;
+}[keyof U];
+
+export type TRemoteService<T> = {
+  [P in TFilter<T, Function | Subject<any>>]: T[P] extends Function
+    ? (...args: Parameters<T[P]>) => Promise<ReturnType<T[P]>>
+    : T[P];
+};
 
 /**
  * 使用远程服务

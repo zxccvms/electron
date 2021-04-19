@@ -1,6 +1,6 @@
 import { injectable, inject, TRemoteService } from "src/base/injecter";
 import fs from "fs";
-import { MAIN_PROCESS, TRemoteService } from "src/base/const";
+import { MAIN_PROCESS } from "src/base/const";
 import { BabelService } from "src/main/services";
 import crypto from "crypto"; //用来加密
 import zlib from "zlib"; //用来压缩
