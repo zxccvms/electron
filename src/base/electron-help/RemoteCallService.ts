@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, ipcRenderer, remote } from "electron";
+import { ipcMain, ipcRenderer, remote } from "electron";
 import { BehaviorSubject, Subject } from "rxjs";
 import { getWindowsByName, hasWindowName } from "src/base/electron-help";
 import { randomString } from "src/base/js-help/string";
@@ -10,7 +10,6 @@ const ID_LENGTH = 5;
 const REMOTE_CHANNEL = "REMOTE_CHANNEL";
 /** 自定义的BehaviorSubject的初始值 */
 const CUSTOM_BEHAVIOR_SUBJECTINIT_VALUE = "!@#$%^&*()";
-/** 主进程的窗口名 */
 
 export enum ERemoteCallAction {
   callFn = "call-fn", // 调用函数
@@ -19,52 +18,70 @@ export enum ERemoteCallAction {
   sendData = "send-data", // 调用属性&属性改变 发送数据
 }
 
-export type TRemoteCallData = {
+type TCallFnPayload = {
+  serviceName: string;
+  key: string;
+  params?: any[];
+};
+
+type TCallAttrPayload = {
+  serviceName: string;
+  key: string;
+};
+
+type TSendResultPayload = any;
+
+type TSendDataPayload = {
+  serviceName: string;
+  key: string;
+  data: any;
+};
+
+type TPayload<T extends ERemoteCallAction> = T extends ERemoteCallAction.callFn
+  ? TCallFnPayload
+  : T extends ERemoteCallAction.callAttr
+  ? TCallAttrPayload
+  : T extends ERemoteCallAction.sendResult
+  ? TSendResultPayload
+  : TSendDataPayload;
+
+export type TRemoteCallData<T extends ERemoteCallAction> = {
   requestId: string;
   target: string;
   source: string;
-  action: ERemoteCallAction;
-  payload?: {
-    serviceName?: string;
-    key?: string;
-    params?: any[];
-    [key: string]: any;
-  };
+  action: T;
+  payload: TPayload<T>;
 };
 
 /** 调用主进程或渲染进程(其他窗口)的服务 */
 class RemoteCallService {
-  currentWindowName: string;
-  private _remoteServiceMap = new Map();
+  private _remoteServiceMap: Map<
+    string,
+    { [key: string]: Function | Subject<any> }
+  > = new Map();
   private _attrWindowNamesMap: Map<string, string[]> = new Map();
-  private _ipc: Electron.IpcRenderer | Electron.IpcMain;
+  private _ipc = remote ? ipcRenderer : ipcMain;
+  currentWindowName = remote ? remote.getCurrentWindow().title : MAIN_PROCESS;
 
   constructor() {
-    this.init();
     this.onMessage();
-  }
-
-  // 根据环境初始化属性
-  private init() {
-    if (remote) {
-      this.currentWindowName = remote.getCurrentWindow().title;
-      this._ipc = ipcRenderer;
-    } else {
-      this.currentWindowName = MAIN_PROCESS;
-      this._ipc = ipcMain;
-    }
   }
 
   /** 监听主进程或渲染进程(其他窗口)发来的消息 */
   private onMessage() {
-    this._ipc.on(REMOTE_CHANNEL, (_, data: TRemoteCallData) => {
-      console.info(`RemoteCallService onMessage: `, data);
-      this[data.action]?.(data);
-    });
+    this._ipc.on(
+      REMOTE_CHANNEL,
+      (_, data: TRemoteCallData<ERemoteCallAction>) => {
+        console.info(`RemoteCallService onMessage: `, data);
+        this[data.action]?.(data);
+      }
+    );
   }
 
   /** 调用本地服务的方法 */
-  async [ERemoteCallAction.callFn](data: TRemoteCallData) {
+  async [ERemoteCallAction.callFn](
+    data: TRemoteCallData<ERemoteCallAction.callFn>
+  ) {
     const { requestId, payload, source } = data;
     const { serviceName, key, params = [] } = payload;
 
@@ -81,7 +98,9 @@ class RemoteCallService {
   }
 
   /** 调用本地服务的rxjs属性 */
-  [ERemoteCallAction.callAttr](data: TRemoteCallData) {
+  [ERemoteCallAction.callAttr](
+    data: TRemoteCallData<ERemoteCallAction.callAttr>
+  ) {
     const { payload, source } = data;
     const { serviceName, key } = payload;
 
@@ -134,14 +153,16 @@ class RemoteCallService {
   }
 
   /** 远程服务属性更新，更新此服务的代理属性 */
-  [ERemoteCallAction.sendData](data: TRemoteCallData) {
+  [ERemoteCallAction.sendData](
+    data: TRemoteCallData<ERemoteCallAction.sendData>
+  ) {
     const { payload, source } = data;
     const { serviceName, key, data: _data } = payload;
 
     const mapKey = `${source}-${serviceName}`;
     const service = this._remoteServiceMap.get(mapKey);
 
-    service[key]?.next(_data);
+    (service[key] as Subject<any>)?.next(_data);
   }
 
   /**
@@ -150,7 +171,11 @@ class RemoteCallService {
    * @param windowName 窗口名
    * @param data 数据
    */
-  sendMessage(channel: string, windowName: string, data: TRemoteCallData) {
+  sendMessage(
+    channel: string,
+    windowName: string,
+    data: TRemoteCallData<ERemoteCallAction>
+  ) {
     // 经过injecter的useService包装 进入到此方法已是调用其他进程或窗口了
     console.info(`RemoteCallService sendMessage: `, data);
 
@@ -162,10 +187,10 @@ class RemoteCallService {
     }
   }
 
-  private sendMessageWrap(
+  private sendMessageWrap<T extends ERemoteCallAction>(
     windowName: string,
-    action: ERemoteCallAction,
-    payload: any
+    action: T,
+    payload: TPayload<T>
   ) {
     const requestId = randomString(ID_LENGTH);
 
@@ -179,10 +204,10 @@ class RemoteCallService {
   }
 
   /** 给主进程或渲染进程(其他窗口)发送消息并得到返回值 */
-  private async sendMessageAndReturn(
+  private async sendMessageAndReturn<T extends ERemoteCallAction>(
     windowName: string,
-    action: ERemoteCallAction,
-    payload: any
+    action: T,
+    payload: TPayload<T>
   ) {
     const requestId = randomString(ID_LENGTH);
     this.sendMessage(REMOTE_CHANNEL, windowName, {
@@ -206,7 +231,7 @@ class RemoteCallService {
   /** 生成代理的服务对象 */
   private createProxyService(serviceName: string, windowName: string) {
     return new Proxy(Object.create(null), {
-      get: (obj, key) => {
+      get: (obj, key: string) => {
         if (obj[key]) return obj[key];
 
         if (key[0] === "$") {
