@@ -14,9 +14,12 @@ module.exports = merge(baseConfig, {
   devServer,
   devtool: 'inline-source-map',
   target: 'electron-renderer',
-  entry: path.resolve(__dirname, '../src/render/index.ts'),
+  entry: {
+    index: path.resolve(__dirname, '../src/render/index.ts'),
+    child: path.resolve(__dirname, '../src/render/child.ts'),
+  },
   output: {
-    filename: 'index.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, '../dist'),
   },
   module: {
@@ -52,7 +55,14 @@ module.exports = merge(baseConfig, {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      filename: "index.html",
       template: path.resolve(__dirname, '../src/render/index.html'),
+      chunks: ["index"]
+    }),
+    new HtmlWebpackPlugin({
+      filename: "child.html",
+      template: path.resolve(__dirname, '../src/render/child.html'),
+      chunks: ["child"]
     }),
   ],
 })

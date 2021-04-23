@@ -18,7 +18,8 @@ function ceateWindow(title: string) {
 
   // 载入页面
   // win.loadURL(`file://${path.resolve(__dirname, "./index.html")}`);
-  win.loadURL("http://localhost:8080/");
+  if (title === "main") win.loadURL("http://localhost:8080/index.html");
+  else win.loadURL("http://localhost:8080/child.html");
 
   // 开启开发者工具
   win.webContents.openDevTools();
@@ -27,5 +28,5 @@ function ceateWindow(title: string) {
 app.on("ready", () => {
   useService("BabelService");
   ceateWindow("main");
-  // ceateWindow("child");
+  ceateWindow("child");
 });
