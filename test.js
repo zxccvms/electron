@@ -2,10 +2,8 @@ const { injectable, useService, inject } = require("injecter");
 const React = require("react");
 const ReactDom = require("react-dom");
 const { useState, useCallback } = React
-const testService = useService('Test2Service')
 
 const root = document.querySelector('#root')
-
 
 console.log('使用react替换界面元素')
 

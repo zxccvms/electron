@@ -1,15 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useService } from "src/base/injecter";
 import { ExtensionsService } from "src/render/services";
+import { remote } from "electron";
 
 const extensionsService = useService<ExtensionsService>("ExtensionsService");
 
 const Extension = () => {
-  useEffect(() => {
-    extensionsService.loader("C:/Users/cjc/Desktop/electron/test");
+  const onClick = useCallback(async () => {
+    const { filePaths } = await remote.dialog.showOpenDialog({
+      properties: ["openFile"],
+    });
+
+    const filePath = filePaths[0];
+    extensionsService.loader(filePath);
   }, []);
 
-  return <div>extension</div>;
+  return <button onClick={onClick}>选择插件文件</button>;
 };
 
 export default Extension;
