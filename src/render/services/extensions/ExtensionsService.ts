@@ -52,7 +52,7 @@ class ExtensionsService {
     })()`;
   }
 
-  private _require(moduleName) {
+  private _require(moduleName: string) {
     switch (moduleName) {
       case "injecter":
         return require("src/base/injecter");
@@ -67,7 +67,7 @@ class ExtensionsService {
 
   private _runCode(code: string) {
     try {
-      const require = this._require;
+      const require = (moduleName) => this._require(moduleName);
       eval(this._codeWrap(code));
     } catch (e) {
       console.error("ExtensionsService runCode error: ", e);
