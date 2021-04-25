@@ -7,7 +7,7 @@ const windowService = useService<WindowService>("WindowService");
 const extensionsService = useService<ExtensionsService>("ExtensionsService");
 
 const Preview = (props) => {
-  const { onChange } = props;
+  const { onChange, content = "" } = props;
 
   const onClick = useCallback(() => {
     const a = onChange(123);
@@ -16,7 +16,7 @@ const Preview = (props) => {
       a
     );
   }, []);
-  return <button onClick={onClick}>Preview</button>;
+  return <button onClick={onClick}>{content || Preview}</button>;
 };
 
 export default windowService.windowWrap(Preview, EWindowName.Preview);

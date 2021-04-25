@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { EWindowName } from "src/base/const/type.d";
 import { useService } from "src/base/injecter";
 import { WindowService } from "src/render/services";
@@ -8,7 +8,15 @@ const windowService = useService<WindowService>("WindowService");
 const CreateWindow = () => {
   const onClick = useCallback(() => {
     windowService.showWindow(EWindowName.Preview, {
+      a: {
+        b: 1,
+      },
+      content: "1234",
+      array: [1, 2, 3],
       onChange: (content) => {
+        console.log(content);
+      },
+      onChange1: (content) => {
         console.log(content);
       },
     });

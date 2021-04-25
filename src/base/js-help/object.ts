@@ -9,7 +9,8 @@ export function deepTraverse(
     chainKey: string,
     parent: object | Array<any>
   ) => boolean | void,
-  parentKey: string = ""
+  parentKey: string = "",
+  callStack = []
 ): void {
   const type = Object.prototype.toString.call(target);
   if (!(type === "[object Object]" || type === "[object Array]")) return;
@@ -18,10 +19,12 @@ export function deepTraverse(
     const chainKey = parentKey ? parentKey + connector + key : key;
     const next = cb(key, value, chainKey, target);
     if (next === false) continue;
+    if (callStack.indexOf(value) !== -1) continue;
 
     const type = Object.prototype.toString.call(target);
     if (type === "[object Object]" || type === "[object Array]") {
-      deepTraverse(value, cb, chainKey);
+      callStack.push(value);
+      deepTraverse(value, cb, chainKey, callStack);
     }
   }
 }
@@ -33,7 +36,11 @@ export function getValueByChainKey(
 ): any {
   const keys = chainKey.split(connector);
 
-  return keys.reduce((pre, key) => pre[key], target);
+  return keys.reduce((pre, key) => {
+    // 解决函数的this指向问题
+    if (pre[key] instanceof Function) return pre[key].bind(pre);
+    return pre[key];
+  }, target);
 }
 
 /** 根据链条键设置值 */

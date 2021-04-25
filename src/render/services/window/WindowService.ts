@@ -2,11 +2,12 @@ import { remote, BrowserWindow, ipcRenderer } from "electron";
 import React from "react";
 import { inject, injectable, TRemoteService } from "src/base/injecter";
 import { EWindowName } from "src/base/const/type.d";
-import { deepTraverse } from "src/base/js-help/object";
+import { deepTraverse, getValueByChainKey } from "src/base/js-help/object";
 import { MAIN_PROCESS } from "src/base/const";
 import { WindowGeneratorService } from "src/main/services";
 import { clone } from "ramda";
 import { randomString } from "src/base/js-help/string";
+import { BehaviorSubject } from "rxjs";
 
 const CHANNEL_NAME_PLACEHOLDER = "CHANNEL_NAME";
 const matchChannelNameReg = /\$CHANNEL_NAME\$\{(.*)\}/;
@@ -77,7 +78,8 @@ class WindowService {
     deepTraverse(handleProps, (key, value, chainKey, parent) => {
       if (value instanceof Function) {
         chainKeys.push(key);
-        parent[key] = this._functionWrapper(window, chainKey, value);
+        const originFn = getValueByChainKey(props, chainKey) as Function;
+        parent[key] = this._functionWrapper(window, chainKey, originFn);
       }
     });
 
@@ -90,7 +92,7 @@ class WindowService {
     props: T
   ): T {
     deepTraverse(props, (key, value, _, parent) => {
-      if (typeof value === "string") {
+      if (typeof value === "string" && matchChannelNameReg.test(value)) {
         parent[key] = this._fcuntionResolver(targetWindow, value);
       }
     });

@@ -6,17 +6,18 @@ import { Filter } from "src/base/const/type.d";
 
 const currentWindowName = remoteCallService.currentWindowName;
 
-// 在渲染进程的window对象上挂载useService方法
-if (currentWindowName !== MAIN_PROCESS) {
-  window.__useService = useService;
-}
-
 /** 本地服务实例映射表 */
 const entitesMap = new Map();
 /** 本地服务实例代理映射表 在使用时才生成实例 优化加载性能*/
 const entitesProxyMap = new Map();
 /** 本地服务映射表 */
 const ServiceMap = new Map();
+
+// 在渲染进程的window对象上挂载useService方法 服务实例
+if (currentWindowName !== MAIN_PROCESS) {
+  window.__useService = useService;
+  window.entitesMap = entitesMap;
+}
 
 /** 服务实例化 */
 function instantiation(serviceName: string) {
@@ -51,7 +52,8 @@ function createEntitesProxy(serviceName: string) {
     get: (_, key) => {
       const entites = getEntites(serviceName);
       const result = entites[key];
-      if (!!result && result.bind) return result.bind(entites);
+      // 函数this指向更改
+      if (result instanceof Function) return result.bind(entites);
       return result;
     },
   });
