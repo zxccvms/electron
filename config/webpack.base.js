@@ -1,6 +1,8 @@
 const webpack = require('webpack')
 const path = require('path')
 
+const globalFilePath = path.resolve(__dirname, '../src/base/js-help/global.ts')
+
 module.exports = {
   devtool: 'inline-source-map',
   resolve: {
@@ -56,6 +58,10 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       TEST_VALUE: JSON.stringify('test')
+    }),
+    new webpack.ProvidePlugin({
+      empty: [globalFilePath, 'empty'],
+      noop: [globalFilePath, 'noop']
     })
   ],
 }

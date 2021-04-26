@@ -2,7 +2,7 @@ import { ipcMain, ipcRenderer, remote } from "electron";
 import { BehaviorSubject, Subject } from "rxjs";
 import { getWindowsByName, hasWindowName } from "src/base/electron-help";
 import { randomString } from "src/base/js-help/string";
-import { useLocalService } from "src/base/injecter";
+import { TRemoteService, useLocalService } from "src/base/injecter";
 import { MAIN_PROCESS } from "src/base/const";
 
 const ID_LENGTH = 5;
@@ -55,6 +55,7 @@ export type TRemoteCallData<T extends ERemoteCallAction> = {
 
 /** 调用主进程或渲染进程(其他窗口)的服务 */
 class RemoteCallService {
+  /** 远程服务的map */
   private _remoteServiceMap: Map<
     string,
     { [key: string]: Function | Subject<any> }
@@ -263,15 +264,18 @@ class RemoteCallService {
   }
 
   /** 调用主进程或渲染进程(其他窗口)的服务 */
-  useRemoteService(serviceName: string, windowName: string) {
+  useRemoteService<T>(
+    serviceName: string,
+    windowName: string
+  ): TRemoteService<T> {
     const key = `${windowName}-${serviceName}`;
     const service = this._remoteServiceMap.get(key);
-    if (service) return service;
+    if (service) return service as TRemoteService<T>;
 
     const proxy = this.createProxyService(serviceName, windowName);
     this._remoteServiceMap.set(key, proxy);
 
-    return proxy;
+    return proxy as TRemoteService<T>;
   }
 }
 

@@ -104,10 +104,10 @@ class WindowService {
   private _functionWrapper(
     window: BrowserWindow,
     chainKey: string,
-    fn: Function
+    fn: Function = noop
   ) {
     const channelName = this._getChannelName(window.id, chainKey);
-    ipcRenderer.on(channelName, async (e, randomId, ...params) => {
+    ipcRenderer.on(channelName, async (_, randomId, ...params) => {
       const result = await fn(...params);
       window.webContents.send(channelName + randomId, result);
     });

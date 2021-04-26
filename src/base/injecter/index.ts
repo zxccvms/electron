@@ -15,7 +15,7 @@ const ServiceMap = new Map();
 
 // 在渲染进程的window对象上挂载useService方法 服务实例
 if (currentWindowName !== MAIN_PROCESS) {
-  window.__useService = useService;
+  window.__useService = useLocalService;
   window.entitesMap = entitesMap;
 }
 
@@ -48,7 +48,7 @@ function getEntites(serviceName: string) {
 
 /** 创建服务实例代理 */
 function createEntitesProxy(serviceName: string) {
-  const proxy = new Proxy(Object.create(null), {
+  const proxy = new Proxy(empty, {
     get: (_, key) => {
       const entites = getEntites(serviceName);
       const result = entites[key];
