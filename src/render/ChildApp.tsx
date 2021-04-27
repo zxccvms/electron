@@ -5,14 +5,13 @@ import { useService } from "src/base/injecter";
 import { WindowService } from "src/render/services";
 import { EWindowName } from "src/base/const/type.d";
 import { WINDOW_RENDER_CHANNEL_NAME } from "src/render/services/window/WindowService";
-
-import Preview from "src/render/pages/preview";
+import { asyncWrapper } from "src/base/react-help/asyncWrap";
 
 const pageConfigMap = {
   [EWindowName.Preview]: {
     width: 800,
     height: 800,
-    Component: Preview,
+    Component: () => import("src/render/pages/preview"),
   },
 };
 
@@ -22,12 +21,13 @@ ipcRenderer.once(
     const windowService = useService<WindowService>("WindowService");
     const window = windowService.window;
     const { width, height, Component } = pageConfigMap[windowName];
+    const AsyncComponent = asyncWrapper(Component);
 
     const sourceWindow = remote.BrowserWindow.fromId(sourceWindowId);
     const handleProps = windowService.propsResolver(sourceWindow, props);
 
     ReactDom.render(
-      <Component {...handleProps} />,
+      <AsyncComponent {...handleProps} />,
       document.querySelector("#root")
     );
 

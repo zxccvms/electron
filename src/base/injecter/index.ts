@@ -176,7 +176,7 @@ const matchActionReg = /^(.+)\/(.+)$/;
 
 /**
  * 通过命令形式调用某个服务的方法
- * @param {string} action 动作名 格式: "windowService/showWindow"
+ * @param {string} action 动作名 格式: "WindowService/showWindow"
  */
 export function useAction({
   action = "",

@@ -27,27 +27,41 @@ function wrapPromise(promise) {
   };
 }
 
-export function useAsyncService<T>(serviceName: string): T {
-  const service = new Promise((resolve) => {
-    resolve(useService(serviceName));
-  });
+// export function useAsyncService<T>(serviceName: string): T {
+//   const service = new Promise((resolve) => {
+//     resolve(useService(serviceName));
+//   });
 
-  const handlePromise = wrapPromise(service);
+//   const handlePromise = wrapPromise(service);
 
-  const proxy = new Proxy(service, {
-    get: (_, key) => {
-      const service = handlePromise.read();
-      return service[key];
-    },
-  });
+//   const proxy = new Proxy(service, {
+//     get: (_, key) => {
+//       const service = handlePromise.read();
+//       return service[key];
+//     },
+//   });
 
-  return proxy;
-}
+//   return proxy;
+// }
 
-export const asyncWrap = (Component: React.FC) => {
+// export const asyncWrap = (Component: React.FC) => {
+//   return (props) => (
+//     <Suspense fallback="">
+//       <Component {...props} />
+//     </Suspense>
+//   );
+// };
+
+export function asyncWrapper(
+  factory: () => Promise<{
+    default: React.ComponentType<any>;
+  }>
+): React.FC {
+  const Component = React.lazy(factory);
+
   return (props) => (
     <Suspense fallback="">
       <Component {...props} />
     </Suspense>
   );
-};
+}
