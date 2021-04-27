@@ -165,3 +165,38 @@ export function inject(
     return descriptor;
   };
 }
+
+interface IUseAction {
+  action: string;
+  params?: any[];
+  windowName?: string;
+}
+
+const matchActionReg = /^(.+)\/(.+)$/;
+
+/**
+ * 通过命令形式调用某个服务的方法
+ * @param {string} action 动作名 格式: "windowService/showWindow"
+ */
+export function useAction({
+  action = "",
+  params = [],
+  windowName = currentWindowName,
+}: IUseAction): any {
+  if (!matchActionReg.test(action))
+    throw new Error(`useAction action格式错误: ${action}`);
+  if (!Array.isArray(params))
+    throw new Error(`useAction ${action} params格式错误: 不是一个数组`);
+
+  const [_, serviceName, fnName] = action.match(matchActionReg);
+  const service = useService(serviceName, windowName, false);
+
+  if (!service)
+    throw new Error(
+      `useAction action的服务名错误 不存在此服务名: ${serviceName}`
+    );
+  if (!(service[fnName] instanceof Function))
+    throw new Error(`useAction action的方法名错误: ${fnName}`);
+
+  return service[fnName](...params);
+}

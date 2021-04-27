@@ -7,7 +7,6 @@ import { MAIN_PROCESS } from "src/base/const";
 import { WindowGeneratorService } from "src/main/services";
 import { clone } from "ramda";
 import { randomString } from "src/base/js-help/string";
-import { BehaviorSubject } from "rxjs";
 
 const CHANNEL_NAME_PLACEHOLDER = "CHANNEL_NAME";
 const matchChannelNameReg = /\$CHANNEL_NAME\$\{(.*)\}/;
