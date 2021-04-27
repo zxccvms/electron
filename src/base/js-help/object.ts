@@ -14,18 +14,15 @@ export function deepTraverse(
 ): void {
   const type = Object.prototype.toString.call(target);
   if (!(type === "[object Object]" || type === "[object Array]")) return;
+  if (callStack.indexOf(target) !== -1) return;
+  callStack.push(target);
 
   for (const [key, value] of Object.entries(target)) {
     const chainKey = parentKey ? parentKey + connector + key : key;
     const next = cb(key, value, chainKey, target);
     if (next === false) continue;
-    if (callStack.indexOf(value) !== -1) continue;
 
-    const type = Object.prototype.toString.call(target);
-    if (type === "[object Object]" || type === "[object Array]") {
-      callStack.push(value);
-      deepTraverse(value, cb, chainKey, callStack);
-    }
+    deepTraverse(value, cb, chainKey, callStack);
   }
 }
 
