@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { useService } from "src/base/injecter";
+import { useService } from "src/base/service-manager";
 import { ExtensionsService } from "src/render/services";
 import { remote } from "electron";
 

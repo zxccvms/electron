@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDom from "react-dom";
 import { ipcRenderer, remote } from "electron";
-import { useService } from "src/base/injecter";
+import { useService } from "src/base/service-manager";
 import { WindowService } from "src/render/services";
 import { EWindowName } from "src/base/const/type.d";
 import { WINDOW_RENDER_CHANNEL_NAME } from "src/render/services/window/WindowService";
-import { asyncWrapper } from "src/base/react-help/asyncWrap";
+import { asyncWrapper } from "src/base/react-helper/asyncWrapper";
 
 const pageConfigMap = {
   [EWindowName.Preview]: {
@@ -31,8 +31,8 @@ ipcRenderer.once(
       document.querySelector("#root")
     );
 
-    window.setSize(width, height, true);
     window.setTitle(windowName);
+    window.setSize(width, height, true);
     window.show();
   }
 );

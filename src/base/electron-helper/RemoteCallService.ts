@@ -1,8 +1,8 @@
 import { ipcMain, ipcRenderer, remote } from "electron";
 import { BehaviorSubject, Subject } from "rxjs";
-import { getWindowsByName, hasWindowName } from "src/base/electron-help";
-import { randomString } from "src/base/js-help/string";
-import { TRemoteService, useLocalService } from "src/base/injecter";
+import { getWindowsByName, hasWindowName } from "src/base/electron-helper";
+import { randomString } from "src/base/js-helper/string";
+import { TRemoteService, useLocalService } from "src/base/service-manager";
 import { MAIN_PROCESS } from "src/base/const";
 
 const ID_LENGTH = 5;

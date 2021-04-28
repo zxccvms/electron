@@ -1,6 +1,6 @@
 import { remote, app, BrowserWindow } from "electron";
 import { BehaviorSubject } from "rxjs";
-import { heavyArray } from "src/base/js-help/array";
+import { heavyArray } from "src/base/js-helper/array";
 import { MAIN_PROCESS } from "src/base/const";
 
 class WindowsService {

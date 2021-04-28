@@ -1,4 +1,4 @@
-import { injectable } from "src/base/injecter";
+import { injectable } from "src/base/service-manager";
 import { transformSync } from "@babel/core";
 
 @injectable("BabelService")

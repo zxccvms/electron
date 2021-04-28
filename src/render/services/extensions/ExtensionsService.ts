@@ -1,4 +1,4 @@
-import { injectable, inject, TRemoteService } from "src/base/injecter";
+import { injectable, inject, TRemoteService } from "src/base/service-manager";
 import fs from "fs";
 import { MAIN_PROCESS } from "src/base/const";
 import { BabelService } from "src/main/services";
@@ -55,7 +55,7 @@ class ExtensionsService {
   private _require(moduleName: string) {
     switch (moduleName) {
       case "injecter":
-        return require("src/base/injecter");
+        return require("src/base/service-manager");
       case "react":
         return require("react");
       case "react-dom":

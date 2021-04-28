@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 import "./services";
-import { useService } from "src/base/injecter";
+import { useService } from "src/base/service-manager";
 import { MAIN_PROCESS } from "src/base/const";
 
 // 创建窗口

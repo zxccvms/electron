@@ -1,5 +1,5 @@
 import { BrowserWindow } from "electron";
-import { inject, injectable } from "src/base/injecter";
+import { inject, injectable } from "src/base/service-manager";
 
 @injectable("WindowGeneratorService")
 class WindowGeneratorService {

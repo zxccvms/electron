@@ -1,7 +1,7 @@
 const webpack = require('webpack')
 const path = require('path')
 
-const globalFilePath = path.resolve(__dirname, '../src/base/js-help/global.ts')
+const globalFilePath = path.resolve(__dirname, '../src/base/js-helper/global.ts')
 
 module.exports = {
   devtool: 'inline-source-map',

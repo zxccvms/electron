@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { EWindowName } from "src/base/const/type.d";
-import { useService, useAction } from "src/base/injecter";
+import { useService, useAction } from "src/base/service-manager";
 import { WindowService } from "src/render/services";
 
 // const windowService = useService<WindowService>("WindowService");
