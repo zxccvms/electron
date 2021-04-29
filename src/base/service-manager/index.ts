@@ -21,11 +21,11 @@ if (currentWindowName !== MAIN_PROCESS) {
 
 /** 服务实例化 */
 function instantiation(serviceName: string) {
-  console.info("instantiation ", serviceName);
+  loggerService.info("instantiation ", serviceName);
 
   const Service = ServiceMap.get(serviceName);
   if (!Service) {
-    console.error(`instantiation error: ${serviceName} is not existed`);
+    loggerService.error(`instantiation error: ${serviceName} is not existed`);
     return null;
   }
 
@@ -132,13 +132,25 @@ export function useService<T>(
   }
 }
 
+interface IInjectableOptions {
+  /** 是否需要在项目初始化时生成实例 */
+  isPreposition: boolean;
+}
+
 /**
  * 可注入的服务
  * @param serviceName 服务名
+ * @param options 服务的额外配置
  */
-export function injectable(serviceName: string) {
+export function injectable(
+  serviceName: string,
+  options = {} as IInjectableOptions
+) {
+  const { isPreposition = false } = options;
+
   return (Service) => {
     ServiceMap.set(serviceName, Service);
+    isPreposition && useLocalService(serviceName);
   };
 }
 

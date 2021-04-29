@@ -73,7 +73,7 @@ class RemoteCallService {
     this._ipc.on(
       REMOTE_CHANNEL,
       (_, data: TRemoteCallData<ERemoteCallAction>) => {
-        console.info(`RemoteCallService onMessage: `, data);
+        loggerService.info(`RemoteCallService onMessage: `, data);
         this[data.action]?.(data);
       }
     );
@@ -178,7 +178,7 @@ class RemoteCallService {
     data: TRemoteCallData<ERemoteCallAction>
   ) {
     // 经过injecter的useService包装 进入到此方法已是调用其他进程或窗口了
-    console.info(`RemoteCallService sendMessage: `, data);
+    loggerService.info(`RemoteCallService sendMessage: `, data);
 
     if (windowName === MAIN_PROCESS) {
       ipcRenderer.send(channel, data);
@@ -221,7 +221,7 @@ class RemoteCallService {
 
     const result = await new Promise((res) => {
       this._ipc.once(requestId, (_, data) => {
-        console.info(`RemoteCallService onMessage: `, data);
+        loggerService.info(`RemoteCallService onMessage: `, data);
         res(data.payload);
       });
     });

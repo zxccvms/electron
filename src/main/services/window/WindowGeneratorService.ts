@@ -30,7 +30,6 @@ class WindowGeneratorService {
     });
 
     window.loadURL("http://localhost:8080/child.html");
-    window.webContents.openDevTools();
 
     return window;
   }

@@ -10,3 +10,10 @@ declare const TEST_VALUE: string;
 declare const empty: {};
 /** 空函数 */
 declare const noop: Function;
+/** 日志打印器 */
+declare const loggerService: {
+  log: (...content: any[]) => void;
+  error: (...content: any[]) => void;
+  warn: (...content: any[]) => void;
+  info: (...content: any[]) => void;
+};

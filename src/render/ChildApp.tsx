@@ -34,5 +34,6 @@ ipcRenderer.once(
     window.setTitle(windowName);
     window.setSize(width, height, true);
     window.show();
+    window.webContents.openDevTools();
   }
 );

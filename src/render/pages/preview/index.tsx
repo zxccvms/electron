@@ -11,7 +11,7 @@ const Preview = (props) => {
 
   const onClick = useCallback(() => {
     const a = onChange(123);
-    console.log(
+    loggerService.log(
       "taozhizhu ~🚀 file: index.tsx ~🚀 line 13 ~🚀 onClick ~🚀 a",
       a
     );

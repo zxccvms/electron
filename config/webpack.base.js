@@ -8,7 +8,8 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     alias: {
-      src: path.resolve(__dirname, '../src')
+      src: path.resolve(__dirname, '../src'),
+      "ui-lib": path.resolve(__dirname, '../src/render/ui-lib'),
     }
   },
   module: {
@@ -61,7 +62,8 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       empty: [globalFilePath, 'empty'],
-      noop: [globalFilePath, 'noop']
+      noop: [globalFilePath, 'noop'],
+      loggerService: [globalFilePath, 'loggerService']
     })
   ],
 }

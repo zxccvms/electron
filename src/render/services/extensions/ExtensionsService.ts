@@ -19,7 +19,7 @@ class ExtensionsService {
       const code = await this.babelService.jsxTransform(content);
       this._runCode(code);
     } catch (e) {
-      console.error("ExtensionsService loader error: ", e);
+      loggerService.error("ExtensionsService loader error: ", e);
     }
   }
 
@@ -70,7 +70,7 @@ class ExtensionsService {
       const require = (moduleName) => this._require(moduleName);
       eval(this._codeWrap(code));
     } catch (e) {
-      console.error("ExtensionsService runCode error: ", e);
+      loggerService.error("ExtensionsService runCode error: ", e);
     }
   }
 }

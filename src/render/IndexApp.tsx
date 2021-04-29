@@ -1,15 +1,13 @@
 import React from "react";
 import ReactDom from "react-dom";
 
-import Extension from "./pages/extension";
-import CreateWindow from "./pages/createWindow";
+import Workbench from "src/render/pages/workbench";
 
 const IndexApp = (props) => {
   return (
-    <div>
-      <Extension />
-      <CreateWindow />
-    </div>
+    <>
+      <Workbench />
+    </>
   );
 };
 
