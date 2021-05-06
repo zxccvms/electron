@@ -4,10 +4,10 @@ import { TDragInfo } from "./DragService";
 
 export enum EDragContainerEvent {
   destroy = "destroy",
-  /** 添加元素 */
-  append = "append",
-  /** 排序元素 */
-  sort = "sort",
+  /** 插入元素 */
+  insert = "insert",
+  /** 移除元素 */
+  remove = "remove",
   mouseleave = "mouseleave",
   mousedown = "mousedown",
 }
@@ -28,11 +28,11 @@ export type TDragContainerOptions = {
 
 type TDragContainerEvent = {
   [EDragContainerEvent.destroy]: () => void;
-  [EDragContainerEvent.append]: (
+  [EDragContainerEvent.insert]: (
     target: HTMLElement,
     children: HTMLCollection
   ) => void;
-  [EDragContainerEvent.sort]: (children: HTMLCollection) => void;
+  [EDragContainerEvent.remove]: (target: HTMLElement) => void;
   [EDragContainerEvent.mouseleave]: () => void;
   [EDragContainerEvent.mousedown]: (dragInfo: TDragInfo) => void;
 };
@@ -91,27 +91,23 @@ class DragContainer extends EventService<TDragContainerEvent> {
     document.body.appendChild(absoluteElement);
 
     let source = null;
-    let absolute = null;
     let placeholder = null;
     if (this.options.mode === EDragContainerMode.normal) {
       const cloneEle = childElement.cloneNode(true);
 
       source = cloneEle;
-      absolute = absoluteElement;
-      placeholder = childElement;
+      // placeholder = childElement;
     } else if (this.options.mode === EDragContainerMode.model) {
       source = childElement;
-      absolute = absoluteElement;
     }
 
     return {
       source,
-      absolute,
+      absolute: absoluteElement,
       offsetX,
       offsetY,
       placeholder,
       sourceContainer: this,
-      // targetContainer: null,
     };
   }
 
@@ -140,7 +136,7 @@ class DragContainer extends EventService<TDragContainerEvent> {
     cloneEle.style.position = "absolute";
     cloneEle.style.width = `${width}px`;
     cloneEle.style.height = `${height}px`;
-    cloneEle.style.opacity = `${(Number(cloneEle.style.opacity) || 1) * 0.8}`;
+    cloneEle.style.opacity = `${(Number(cloneEle.style.opacity) || 1) * 0.4}`;
     // 鼠标事件透过克隆的元素
     cloneEle.style.pointerEvents = "none";
 

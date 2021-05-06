@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { MAIN_CONTAINER } from "src/base/const";
 import useObservable from "src/base/react-helper/useObservable";
 import { useService } from "src/base/service-manager";
 import { ComponentModelService, DragManagerService } from "src/render/services";
@@ -34,9 +35,14 @@ const SideBar = () => {
 
   return (
     <Panel flex="0 0 100px" flexDirection="column" ref={onInit}>
-      {Object.values(componentModelMap).map((componentModel) => (
-        <ModelItem componentModel={componentModel} key={componentModel.type} />
-      ))}
+      {Object.values(componentModelMap)
+        .filter((componentModel) => componentModel.type !== MAIN_CONTAINER)
+        .map((componentModel) => (
+          <ModelItem
+            componentModel={componentModel}
+            key={componentModel.type}
+          />
+        ))}
     </Panel>
   );
 };

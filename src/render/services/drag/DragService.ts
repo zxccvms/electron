@@ -94,22 +94,19 @@ class DragService {
     if (containerAndRefChild) {
       const [targetContainer] = containerAndRefChild;
 
-      if (sourceContainer === targetContainer) {
-        targetContainer.send(
-          EDragContainerEvent.sort,
-          targetContainer.element.children
-        );
-      } else {
-        if (placeholder) this._removeElement(placeholder);
-        targetContainer.send(
-          EDragContainerEvent.append,
-          source,
-          targetContainer.element.children
-        );
+      targetContainer.send(
+        EDragContainerEvent.insert,
+        placeholder,
+        targetContainer.element.children
+      );
+
+      if (sourceContainer !== targetContainer) {
+        sourceContainer.send(EDragContainerEvent.remove, source);
       }
     }
 
     if (absolute) this._removeElement(absolute);
+    if (placeholder) this._removeElement(placeholder);
 
     this._dragInfo = null;
   };
@@ -117,15 +114,15 @@ class DragService {
   /** 当拖拽项在容器内时 */
   private _onDragItemInContainer(
     container: DragContainer,
-    childEle: HTMLElement
+    refChild: HTMLElement
   ) {
     const { element } = container;
     const { source, placeholder } = this._dragInfo;
 
     const newPlaceholder = source.cloneNode(true);
 
-    if (childEle) {
-      element.insertBefore(newPlaceholder, childEle);
+    if (refChild) {
+      element.insertBefore(newPlaceholder, refChild);
     } else {
       element.appendChild(newPlaceholder);
     }
@@ -155,6 +152,7 @@ class DragService {
       if ((container = this._containerMap.get(ele))) break;
     }
 
+    if (!container) return null;
     const refChild = container.getDragElementByPath(path);
 
     return [container, refChild];
