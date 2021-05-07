@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { useService } from "src/base/service-manager";
 import {
   ComponentEntityService,
@@ -27,14 +27,14 @@ const Container: React.FC<IContainerProps> = (props) => {
   const { componentEntity } = props;
   const { id, attrNode, childNode = [] } = componentEntity;
   const { tag, style } = attrNode;
+  const container = useRef<DragContainer>(null);
 
   const onInit = useCallback((node: HTMLElement) => {
-    let container = null as DragContainer;
     if (node) {
       const editorDrag = dragManagerService.get(EDragName.editor);
-      container = editorDrag.setContainerItem(node);
+      container.current = editorDrag.setContainerItem(node);
 
-      container.on(
+      container.current.on(
         EDragContainerEvent.insert,
         (target: HTMLElement, eles: HTMLCollection) => {
           const type = target.getAttribute("componenttype");
@@ -51,13 +51,13 @@ const Container: React.FC<IContainerProps> = (props) => {
         }
       );
 
-      container.on(EDragContainerEvent.remove, (target) => {
+      container.current.on(EDragContainerEvent.remove, (target) => {
         const id = target.getAttribute("componentid");
 
         componentEntityService.removeComponentEntity(componentEntity.id, id);
       });
     } else {
-      container.destroy();
+      container.current.destroy();
     }
   }, []);
 

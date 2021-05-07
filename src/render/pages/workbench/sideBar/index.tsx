@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { MAIN_CONTAINER } from "src/base/const";
 import useObservable from "src/base/react-helper/useObservable";
 import { useService } from "src/base/service-manager";
@@ -19,17 +19,17 @@ const SideBar = () => {
   const componentModelMap = useObservable(
     componentModelService.$componentModelMap
   );
+  const container = useRef<DragContainer>(null);
 
   const onInit = useCallback((node: HTMLElement) => {
-    let container = null as DragContainer;
     if (node) {
       const editorDrag = dragManagerService.get(EDragName.editor);
 
-      container = editorDrag.setContainerItem(node, {
+      container.current = editorDrag.setContainerItem(node, {
         mode: EDragContainerMode.model,
       });
     } else {
-      container.destroy();
+      container.current.destroy();
     }
   }, []);
 

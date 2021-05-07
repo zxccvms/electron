@@ -10,8 +10,6 @@ export type TDragInfo = {
   source: HTMLElement;
   /** 源容器 */
   sourceContainer: DragContainer;
-  /** 目标容器 */
-  // targetContainer: DragContainer;
   /** 定位的元素 */
   absolute: HTMLElement;
   /** 占位的元素 */
@@ -20,6 +18,8 @@ export type TDragInfo = {
   offsetX: number;
   /** 鼠标点击的偏移y */
   offsetY: number;
+  /** 源元素的display */
+  display: string;
 };
 
 const rootEle = document.getElementById("#root");
@@ -53,6 +53,10 @@ class DragService {
       this._dragInfo = dragInfo;
     });
 
+    container.on(EDragContainerEvent.destroy, () => {
+      this._containerMap.delete(ele);
+    });
+
     this._containerMap.set(ele, container);
 
     return container;
@@ -70,6 +74,7 @@ class DragService {
   }
 
   private _mousemoveFn = (e: MouseEvent) => {
+    e.stopPropagation();
     if (!this._dragInfo) return;
 
     const { absolute, offsetX, offsetY } = this._dragInfo;
@@ -86,21 +91,31 @@ class DragService {
   };
 
   private _mouseupFn = (e: MouseEvent) => {
+    e.stopPropagation();
     if (!this._dragInfo) return;
-    const { absolute, source, placeholder, sourceContainer } = this._dragInfo;
+    const {
+      absolute,
+      source,
+      placeholder,
+      sourceContainer,
+      display,
+    } = this._dragInfo;
 
     const containerAndRefChild = this._getContainerAndRefChildByPath(e.path);
-
     if (containerAndRefChild) {
       const [targetContainer] = containerAndRefChild;
 
-      targetContainer.send(
-        EDragContainerEvent.insert,
-        placeholder,
-        targetContainer.element.children
-      );
+      if (placeholder) {
+        targetContainer.send(
+          EDragContainerEvent.insert,
+          placeholder,
+          targetContainer.element.children
+        );
+      }
 
-      if (sourceContainer !== targetContainer) {
+      if (sourceContainer === targetContainer) {
+        source.style.display = display;
+      } else {
         sourceContainer.send(EDragContainerEvent.remove, source);
       }
     }
@@ -117,9 +132,11 @@ class DragService {
     refChild: HTMLElement
   ) {
     const { element } = container;
-    const { source, placeholder } = this._dragInfo;
+    const { source, placeholder, display } = this._dragInfo;
 
-    const newPlaceholder = source.cloneNode(true);
+    const newPlaceholder = source.cloneNode(true) as HTMLElement;
+    if (newPlaceholder.style.display !== display)
+      newPlaceholder.style.display = display;
 
     if (refChild) {
       element.insertBefore(newPlaceholder, refChild);
@@ -129,13 +146,16 @@ class DragService {
 
     if (placeholder) this._removeElement(placeholder);
 
-    this._dragInfo.placeholder = newPlaceholder as HTMLElement;
+    this._dragInfo.placeholder = newPlaceholder;
   }
 
   /** 当拖拽项离开容器时 */
   private _onDragItemOutContainer = () => {
     const { placeholder } = this._dragInfo;
-
+    console.log(
+      "taozhizhu ~🚀 file: DragService.ts ~🚀 line 167 ~🚀 DragService ~🚀 placeholder",
+      placeholder
+    );
     if (placeholder) this._removeElement(placeholder);
 
     this._dragInfo.placeholder = null;

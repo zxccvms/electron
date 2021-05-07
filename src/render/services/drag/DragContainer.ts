@@ -41,7 +41,6 @@ type TDragContainerEvent = {
 class DragContainer extends EventService<TDragContainerEvent> {
   element: HTMLElement = null;
   options: TDragContainerOptions = null;
-  private _needRemoveListeners: Function[] = [];
   private _listenerConfig = {
     mouseleave: () => this._mouseleaveFn,
     mousedown: () => this._mousedownFn,
@@ -61,19 +60,25 @@ class DragContainer extends EventService<TDragContainerEvent> {
   private _listenerRegister() {
     for (const [eventName, fn] of Object.entries(this._listenerConfig)) {
       this.element.addEventListener(eventName, fn());
-
-      this._needRemoveListeners.push(() =>
-        this.element.removeEventListener(eventName, fn())
-      );
     }
   }
 
-  private _mouseleaveFn = () => {
+  /** 事件注销器 */
+  private _listenerDestroy() {
+    for (const [eventName, fn] of Object.entries(this._listenerConfig)) {
+      this.element.removeEventListener(eventName, fn());
+    }
+  }
+
+  private _mouseleaveFn = (e: MouseEvent) => {
+    if (e.target === this.element) return;
+    e.stopPropagation();
     this.send(EDragContainerEvent.mouseleave);
   };
 
   private _mousedownFn = (e: MouseEvent) => {
     if (e.target === this.element) return;
+    e.stopPropagation();
 
     const dragInfo = this._generateDragInfo(e);
 
@@ -90,22 +95,20 @@ class DragContainer extends EventService<TDragContainerEvent> {
     const absoluteElement = this._createAbsoluteElement(childElement);
     document.body.appendChild(absoluteElement);
 
-    let source = null;
     let placeholder = null;
+    const display = childElement.style.display;
     if (this.options.mode === EDragContainerMode.normal) {
-      const cloneEle = childElement.cloneNode(true);
-
-      source = cloneEle;
-      // placeholder = childElement;
-    } else if (this.options.mode === EDragContainerMode.model) {
-      source = childElement;
+      placeholder = childElement.cloneNode(true) as HTMLElement;
+      childElement.parentElement.insertBefore(placeholder, childElement);
+      childElement.style.display = "none";
     }
 
     return {
-      source,
+      source: childElement,
       absolute: absoluteElement,
       offsetX,
       offsetY,
+      display,
       placeholder,
       sourceContainer: this,
     };
@@ -144,7 +147,8 @@ class DragContainer extends EventService<TDragContainerEvent> {
   }
 
   destroy() {
-    this._needRemoveListeners.forEach((fn) => fn());
+    this._listenerDestroy();
+    this.send(EDragContainerEvent.destroy);
   }
 }
 
