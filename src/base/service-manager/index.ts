@@ -7,16 +7,16 @@ import { Filter } from "src/base/const/type.d";
 const currentWindowName = remoteCallService.currentWindowName;
 
 /** 本地服务实例映射表 */
-const entitesMap = new Map();
+const entityMap = new Map();
 /** 本地服务实例代理映射表 在使用时才生成实例 优化加载性能*/
-const entitesProxyMap = new Map();
+const entityProxyMap = new Map();
 /** 本地服务映射表 */
 const ServiceMap = new Map();
 
 // 在渲染进程的window对象上挂载useService方法 服务实例
 if (currentWindowName !== MAIN_PROCESS) {
   window.__useService = useLocalService;
-  window.entitesMap = entitesMap;
+  window.entityMap = entityMap;
 }
 
 /** 服务实例化 */
@@ -30,7 +30,7 @@ function instantiation(serviceName: string) {
   }
 
   const service = new Service();
-  entitesMap.set(serviceName, service);
+  entityMap.set(serviceName, service);
 
   // 实例化后执行自定义的_constructor代替constructor
   // 依赖的服务请在此方法中使用
@@ -39,26 +39,26 @@ function instantiation(serviceName: string) {
   return service;
 }
 
-function getEntites(serviceName: string) {
-  let entites = entitesMap.get(serviceName);
-  if (!entites) entites = instantiation(serviceName);
+function getEntity(serviceName: string) {
+  let entity = entityMap.get(serviceName);
+  if (!entity) entity = instantiation(serviceName);
 
-  return entites;
+  return entity;
 }
 
 /** 创建服务实例代理 */
-function createEntitesProxy(serviceName: string) {
+function createEntityProxy(serviceName: string) {
   const proxy = new Proxy(empty, {
     get: (_, key) => {
-      const entites = getEntites(serviceName);
-      const result = entites[key];
+      const entity = getEntity(serviceName);
+      const result = entity[key];
       // 函数this指向更改
-      if (result instanceof Function) return result.bind(entites);
+      if (result instanceof Function) return result.bind(entity);
       return result;
     },
   });
 
-  entitesProxyMap.set(serviceName, proxy);
+  entityProxyMap.set(serviceName, proxy);
 
   return proxy;
 }
@@ -67,9 +67,9 @@ function createEntitesProxy(serviceName: string) {
  * 得到服务实例的代理
  * @param serviceName 服务名
  */
-function getEntitesProxy(serviceName: string) {
-  let entitiesProxy = entitesProxyMap.get(serviceName);
-  if (!entitiesProxy) entitiesProxy = createEntitesProxy(serviceName);
+function getEntityProxy(serviceName: string) {
+  let entitiesProxy = entityProxyMap.get(serviceName);
+  if (!entitiesProxy) entitiesProxy = createEntityProxy(serviceName);
 
   return entitiesProxy;
 }
@@ -79,7 +79,7 @@ function getEntitesProxy(serviceName: string) {
  * @param serviceName 服务名
  */
 export function useLocalService<T>(serviceName: string): T {
-  const entities = getEntites(serviceName);
+  const entities = getEntity(serviceName);
   return entities;
 }
 
@@ -89,7 +89,7 @@ export function useLocalService<T>(serviceName: string): T {
  * @param serviceName 服务名
  */
 export function useLocalProxyService<T>(serviceName: string): T {
-  const entitiesProxy = getEntitesProxy(serviceName);
+  const entitiesProxy = getEntityProxy(serviceName);
   return entitiesProxy;
 }
 
