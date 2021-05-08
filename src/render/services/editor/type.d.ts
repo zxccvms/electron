@@ -32,6 +32,10 @@ export type TComponentEntity<T extends EComponentMode> = {
   childNode: T extends EComponentMode.container ? string[] : string;
 };
 
+export type TComponentEntityMap = {
+  [id: string]: TComponentEntity<EComponentMode>;
+};
+
 export type TEtityPosition = {
   entityId: string;
   index: number;

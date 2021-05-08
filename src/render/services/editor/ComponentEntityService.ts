@@ -2,7 +2,12 @@ import LoggerService from "src/base/js-helper/LoggerService";
 import { randomString } from "src/base/js-helper/string";
 import { inject, injectable } from "src/base/service-manager";
 import ComponentModelService from "./ComponentModelService";
-import { TComponentEntity, EComponentMode, TEtityPosition } from "./type";
+import {
+  TComponentEntity,
+  EComponentMode,
+  TEtityPosition,
+  TComponentEntityMap,
+} from "./type";
 import { mergeDeepLeft, clone } from "ramda";
 import { BehaviorSubject } from "rxjs";
 import { redoOrNext } from "src/base/js-helper/loop";
@@ -14,10 +19,11 @@ const ID_LENGTH = 5;
 class ComponentEntityService {
   @inject("ComponentModelService") componentModelService: ComponentModelService;
   private _loggerService = new LoggerService("ComponentEntityService");
+
   /** 组件实例的映射表 */
-  $componentEntityMap: BehaviorSubject<{
-    [id: string]: TComponentEntity<EComponentMode>;
-  }> = new BehaviorSubject({});
+  $componentEntityMap: BehaviorSubject<TComponentEntityMap> = new BehaviorSubject(
+    {}
+  );
   /** 选择的组件id列表 */
   $selectedIds: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
@@ -33,7 +39,7 @@ class ComponentEntityService {
       return null;
     }
 
-    const id = type === MAIN_CONTAINER ? MAIN_CONTAINER : this._createSoloId();
+    const id = type === MAIN_CONTAINER ? MAIN_CONTAINER : this._createSoleId();
     const componentEntites = {
       ...clone(componentModel),
       id,
@@ -48,7 +54,7 @@ class ComponentEntityService {
     const componentEntity = this.getComponentEntityById(id);
     if (!componentEntity) return;
 
-    const newComponentEntity = mergeDeepLeft(params, componentEntity);
+    const newComponentEntity = mergeDeepLeft(componentEntity, params);
 
     this._updateComponentEntityMap([newComponentEntity]);
   }
@@ -61,17 +67,17 @@ class ComponentEntityService {
     if (!containerEntity) return;
 
     const { index, entityId } = entityPosition;
-    const { childNode = [] } = containerEntity;
-    let originIndex = childNode.indexOf(entityId);
+    const newChildNode = [...containerEntity.childNode];
+    let originIndex = newChildNode.indexOf(entityId);
 
-    childNode.splice(index, 0, entityId);
+    newChildNode.splice(index, 0, entityId);
 
     if (originIndex !== -1) {
       if (index < originIndex) originIndex += 1;
-      childNode.splice(originIndex, 1);
+      newChildNode.splice(originIndex, 1);
     }
 
-    containerEntity.childNode = [...childNode];
+    containerEntity.childNode = newChildNode;
 
     this._updateComponentEntityMap([containerEntity]);
   }
@@ -83,12 +89,12 @@ class ComponentEntityService {
     ) as TComponentEntity<EComponentMode.container>;
     if (!containerEntity) return;
 
-    const { childNode = [] } = containerEntity;
-    const index = childNode.indexOf(targetId);
+    const newChildNode = [...containerEntity.childNode];
+    const index = newChildNode.indexOf(targetId);
     if (index === -1) return;
 
-    childNode.splice(index, 1);
-    containerEntity.childNode = [...childNode];
+    newChildNode.splice(index, 1);
+    containerEntity.childNode = newChildNode;
 
     this._updateComponentEntityMap([containerEntity]);
   }
@@ -118,7 +124,7 @@ class ComponentEntityService {
   }
 
   /** 创建唯一id */
-  private _createSoloId(): string {
+  private _createSoleId(): string {
     let id = null;
     const componentEntitesMap = this.$componentEntityMap.getValue();
 

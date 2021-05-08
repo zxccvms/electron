@@ -61,12 +61,6 @@ const Container: React.FC<IContainerProps> = (props) => {
     }
   }, []);
 
-  const childEntities = useMemo(
-    () =>
-      childNode.map((id) => componentEntityService.getComponentEntityById(id)),
-    [childNode]
-  );
-
   return React.createElement(
     tag,
     {
@@ -74,9 +68,10 @@ const Container: React.FC<IContainerProps> = (props) => {
       style,
       ref: onInit,
     },
-    childEntities.map((childEntity) => (
-      <EntityItem componentEntity={childEntity} key={childEntity.id} />
-    ))
+    childNode.map((id) => {
+      const childEntity = componentEntityService.getComponentEntityById(id);
+      return <EntityItem componentEntity={childEntity} key={id} />;
+    })
   );
 };
 
