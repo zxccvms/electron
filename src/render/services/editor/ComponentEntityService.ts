@@ -7,7 +7,7 @@ import {
   EComponentMode,
   TEtityPosition,
   TComponentEntityMap,
-} from "./type";
+} from "./type.d";
 import { mergeDeepLeft, clone } from "ramda";
 import { BehaviorSubject } from "rxjs";
 import { redoOrNext } from "src/base/js-helper/loop";
@@ -43,6 +43,7 @@ class ComponentEntityService {
     const componentEntites = {
       ...clone(componentModel),
       id,
+      parentNode: null,
     };
 
     this._updateComponentEntityMap([componentEntites]);
@@ -54,19 +55,25 @@ class ComponentEntityService {
     const componentEntity = this.getComponentEntityById(id);
     if (!componentEntity) return;
 
-    const newComponentEntity = mergeDeepLeft(componentEntity, params);
+    const newComponentEntity = mergeDeepLeft(params, componentEntity);
 
     this._updateComponentEntityMap([newComponentEntity]);
   }
 
   /** 在容器中插入实例 */
-  insertComponentEntity(containerId: string, entityPosition: TEtityPosition) {
+  insertComponentEntityInContainer(
+    containerId: string,
+    entityPosition: TEtityPosition
+  ) {
     const containerEntity = this.getComponentEntityById(
       containerId
     ) as TComponentEntity<EComponentMode.container>;
     if (!containerEntity) return;
 
     const { index, entityId } = entityPosition;
+    const childEntity = this.getComponentEntityById(entityId);
+    if (!childEntity) return;
+
     const newChildNode = [...containerEntity.childNode];
     let originIndex = newChildNode.indexOf(entityId);
 
@@ -78,16 +85,21 @@ class ComponentEntityService {
     }
 
     containerEntity.childNode = newChildNode;
+    childEntity.parentNode = containerId;
 
-    this._updateComponentEntityMap([containerEntity]);
+    this.setSelectedIds([entityId]);
+    this._updateComponentEntityMap([containerEntity, childEntity]);
   }
 
   /** 在容器中移除实例 */
-  removeComponentEntity(containerId: string, targetId: string) {
+  removeComponentEntityInContainer(containerId: string, targetId: string) {
     const containerEntity = this.getComponentEntityById(
       containerId
     ) as TComponentEntity<EComponentMode.container>;
     if (!containerEntity) return;
+
+    const childEntity = this.getComponentEntityById(targetId);
+    if (!childEntity) return;
 
     const newChildNode = [...containerEntity.childNode];
     const index = newChildNode.indexOf(targetId);
@@ -95,8 +107,9 @@ class ComponentEntityService {
 
     newChildNode.splice(index, 1);
     containerEntity.childNode = newChildNode;
+    childEntity.parentNode = null;
 
-    this._updateComponentEntityMap([containerEntity]);
+    this._updateComponentEntityMap([containerEntity, childEntity]);
   }
 
   /** 通过id得到实例 */
@@ -116,6 +129,56 @@ class ComponentEntityService {
     }
 
     return componentEntites;
+  }
+
+  /** 删除实例 */
+  deleteComponentEntityById(id: string) {
+    const componentEntityMap = this.$componentEntityMap.getValue();
+    const componentEntity = componentEntityMap[id];
+
+    if (!componentEntity) {
+      this._loggerService.warn(
+        `deleteComponentEntityById warn: entites is not existed by id{${id}`
+      );
+      return;
+    }
+
+    const { mode, parentNode } = componentEntity;
+
+    if (mode === EComponentMode.container) {
+      const allChildNodes = this.getAllChildNodes(id) || [];
+
+      for (const id of allChildNodes) {
+        if (componentEntityMap[id]) delete componentEntityMap[id];
+      }
+    }
+
+    this.removeComponentEntityInContainer(parentNode, id);
+
+    delete componentEntityMap[id];
+
+    this.$componentEntityMap.next({
+      ...componentEntityMap,
+    });
+  }
+
+  /** 得到容器的所有子节点 */
+  getAllChildNodes(id: string): string[] {
+    const containerEntity = this.getComponentEntityById(id);
+    if (!containerEntity) return null;
+
+    const { mode, childNode } = containerEntity;
+    if (mode !== EComponentMode.container) return null;
+
+    const result = [];
+    for (const childId of childNode) {
+      const allChildNodes = this.getAllChildNodes(childId);
+      allChildNodes
+        ? result.push(childId, ...allChildNodes)
+        : result.push(childId);
+    }
+
+    return result;
   }
 
   /** 设置选择的组件 */

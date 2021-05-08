@@ -14,6 +14,8 @@ import {
 } from "src/render/services/editor/type.d";
 import EntityItem from "./index";
 
+import styles from "./style/container.less";
+
 const componentEntityService = useService<ComponentEntityService>(
   "ComponentEntityService"
 );
@@ -21,10 +23,12 @@ const dragManagerService = useService<DragManagerService>("DragManagerService");
 
 interface IContainerProps {
   componentEntity: TComponentEntity<EComponentMode.container>;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  isActive?: boolean;
 }
 
 const Container: React.FC<IContainerProps> = (props) => {
-  const { componentEntity } = props;
+  const { componentEntity, onClick = noop, isActive = false } = props;
   const { id, attrNode, childNode = [] } = componentEntity;
   const { tag, style } = attrNode;
   const container = useRef<DragContainer>(null);
@@ -44,18 +48,33 @@ const Container: React.FC<IContainerProps> = (props) => {
             ? componentEntityService.createComponentEntity(type).id
             : target.getAttribute("componentid");
 
-          componentEntityService.insertComponentEntity(componentEntity.id, {
-            index,
-            entityId,
-          });
+          componentEntityService.insertComponentEntityInContainer(
+            componentEntity.id,
+            {
+              index,
+              entityId,
+            }
+          );
         }
       );
 
-      container.current.on(EDragContainerEvent.remove, (target) => {
+      container.current.on(EDragContainerEvent.move, (target: HTMLElement) => {
         const id = target.getAttribute("componentid");
 
-        componentEntityService.removeComponentEntity(componentEntity.id, id);
+        componentEntityService.removeComponentEntityInContainer(
+          componentEntity.id,
+          id
+        );
       });
+
+      container.current.on(
+        EDragContainerEvent.delete,
+        (target: HTMLElement) => {
+          const id = target.getAttribute("componentid");
+
+          componentEntityService.deleteComponentEntityById(id);
+        }
+      );
     } else {
       container.current.destroy();
     }
@@ -65,7 +84,9 @@ const Container: React.FC<IContainerProps> = (props) => {
     tag,
     {
       componentid: id,
+      className: isActive ? styles.active : "",
       style,
+      onClick,
       ref: onInit,
     },
     childNode.map((id) => {

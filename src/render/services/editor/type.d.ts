@@ -9,7 +9,7 @@ export type TAttrNode = {
   /** 标签名 */
   tag: string;
   /** 样式属性 */
-  style?: React.CSSProperties;
+  style: React.CSSProperties;
 };
 
 /** 组件模型 */
@@ -29,6 +29,7 @@ export type TComponentEntity<T extends EComponentMode> = {
   label: string;
   mode: T;
   attrNode: TAttrNode;
+  parentNode: string;
   childNode: T extends EComponentMode.container ? string[] : string;
 };
 
@@ -39,4 +40,9 @@ export type TComponentEntityMap = {
 export type TEtityPosition = {
   entityId: string;
   index: number;
+};
+
+export type TAttr = {
+  name: string;
+  value: any;
 };

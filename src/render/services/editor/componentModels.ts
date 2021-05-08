@@ -38,7 +38,9 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
     mode: EComponentMode.content,
     attrNode: {
       tag: "span",
-      style: {},
+      style: {
+        color: "#666",
+      },
     },
     childNode: "span",
   },
@@ -48,7 +50,9 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
     mode: EComponentMode.content,
     attrNode: {
       tag: "p",
-      style: {},
+      style: {
+        color: "#666",
+      },
     },
     childNode: "p",
   },

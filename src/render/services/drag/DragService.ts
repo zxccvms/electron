@@ -28,7 +28,6 @@ const rootEle = document.getElementById("#root");
 class DragService {
   private _containerMap: Map<HTMLElement, DragContainer> = new Map();
   private _dragInfo: TDragInfo = null;
-  private _needRemoveListeners: Function[] = [];
   private _listenerConfig = {
     mousemove: () => this._mousemoveFn,
     mouseup: () => this._mouseupFn,
@@ -66,10 +65,13 @@ class DragService {
   private _listenerRegister() {
     for (const [eventName, fn] of Object.entries(this._listenerConfig)) {
       document.addEventListener(eventName, fn());
+    }
+  }
 
-      this._needRemoveListeners.push(() =>
-        document.removeEventListener(eventName, fn())
-      );
+  /** 事件注销器 */
+  private _listenerDestroy() {
+    for (const [eventName, fn] of Object.entries(this._listenerConfig)) {
+      document.removeEventListener(eventName, fn());
     }
   }
 
@@ -77,9 +79,22 @@ class DragService {
     e.stopPropagation();
     if (!this._dragInfo) return;
 
-    const { absolute, offsetX, offsetY } = this._dragInfo;
+    const {
+      source,
+      absolute,
+      offsetX,
+      offsetY,
+      sourceContainer,
+    } = this._dragInfo;
     absolute.style.top = `${e.y - offsetY}px`;
     absolute.style.left = `${e.x - offsetX}px`;
+
+    if (
+      source.style.display !== "none" &&
+      sourceContainer.options.mode === EDragContainerMode.normal
+    ) {
+      source.style.display = "none";
+    }
 
     const containerAndRefChild = this._getContainerAndRefChildByPath(e.path);
     if (!containerAndRefChild) return;
@@ -101,27 +116,30 @@ class DragService {
       display,
     } = this._dragInfo;
 
-    const containerAndRefChild = this._getContainerAndRefChildByPath(e.path);
-    if (containerAndRefChild) {
-      const [targetContainer] = containerAndRefChild;
-
-      if (placeholder) {
+    if (placeholder) {
+      const containerAndRefChild = this._getContainerAndRefChildByPath(e.path);
+      if (containerAndRefChild) {
+        const [targetContainer] = containerAndRefChild;
         targetContainer.send(
           EDragContainerEvent.insert,
           placeholder,
           targetContainer.element.children
         );
+        if (sourceContainer === targetContainer) {
+          source.style.display = display;
+        } else if (targetContainer.options.mode === EDragContainerMode.normal) {
+          sourceContainer.send(EDragContainerEvent.move, source);
+        } else {
+          sourceContainer.send(EDragContainerEvent.delete, source);
+        }
+      } else {
+        sourceContainer.send(EDragContainerEvent.delete, source);
       }
 
-      if (sourceContainer === targetContainer) {
-        source.style.display = display;
-      } else {
-        sourceContainer.send(EDragContainerEvent.remove, source);
-      }
+      this._removeElement(placeholder);
     }
 
     if (absolute) this._removeElement(absolute);
-    if (placeholder) this._removeElement(placeholder);
 
     this._dragInfo = null;
   };
@@ -152,10 +170,6 @@ class DragService {
   /** 当拖拽项离开容器时 */
   private _onDragItemOutContainer = () => {
     const { placeholder } = this._dragInfo;
-    console.log(
-      "taozhizhu ~🚀 file: DragService.ts ~🚀 line 167 ~🚀 DragService ~🚀 placeholder",
-      placeholder
-    );
     if (placeholder) this._removeElement(placeholder);
 
     this._dragInfo.placeholder = null;
@@ -185,7 +199,7 @@ class DragService {
   /** drag销毁的方法 */
   destroy = () => {
     this._containerMap.forEach((container) => container.destroy());
-    this._needRemoveListeners.forEach((fn) => fn());
+    this._listenerDestroy();
   };
 }
 

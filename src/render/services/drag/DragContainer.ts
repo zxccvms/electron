@@ -6,8 +6,10 @@ export enum EDragContainerEvent {
   destroy = "destroy",
   /** 插入元素 */
   insert = "insert",
-  /** 移除元素 */
-  remove = "remove",
+  /** 移动元素 */
+  move = "move",
+  /** 删除元素 */
+  delete = "delete",
   mouseleave = "mouseleave",
   mousedown = "mousedown",
 }
@@ -32,7 +34,8 @@ type TDragContainerEvent = {
     target: HTMLElement,
     children: HTMLCollection
   ) => void;
-  [EDragContainerEvent.remove]: (target: HTMLElement) => void;
+  [EDragContainerEvent.move]: (target: HTMLElement) => void;
+  [EDragContainerEvent.delete]: (target: HTMLElement) => void;
   [EDragContainerEvent.mouseleave]: () => void;
   [EDragContainerEvent.mousedown]: (dragInfo: TDragInfo) => void;
 };
@@ -95,21 +98,13 @@ class DragContainer extends EventService<TDragContainerEvent> {
     const absoluteElement = this._createAbsoluteElement(childElement);
     document.body.appendChild(absoluteElement);
 
-    let placeholder = null;
-    const display = childElement.style.display;
-    if (this.options.mode === EDragContainerMode.normal) {
-      placeholder = childElement.cloneNode(true) as HTMLElement;
-      childElement.parentElement.insertBefore(placeholder, childElement);
-      childElement.style.display = "none";
-    }
-
     return {
       source: childElement,
       absolute: absoluteElement,
       offsetX,
       offsetY,
-      display,
-      placeholder,
+      display: childElement.style.display,
+      placeholder: null,
       sourceContainer: this,
     };
   }
