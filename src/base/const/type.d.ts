@@ -3,5 +3,6 @@ export type Filter<U, T> = {
 }[keyof U];
 
 export enum EWindowName {
+  Main = "Main",
   Preview = "Preview",
 }

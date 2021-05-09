@@ -3,6 +3,7 @@ import path from "path";
 import "./services";
 import { useService } from "src/base/service-manager";
 import { MAIN_PROCESS } from "src/base/const";
+import { EWindowName } from "src/base/const/type.d";
 
 // 创建窗口
 function ceateWindow(title: string) {
@@ -28,5 +29,5 @@ function ceateWindow(title: string) {
 app.on("ready", () => {
   useService("WindowGeneratorService", MAIN_PROCESS, false);
   // useService("BabelService");
-  ceateWindow("main");
+  ceateWindow(EWindowName.Main);
 });

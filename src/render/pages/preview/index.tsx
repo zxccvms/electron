@@ -1,22 +1,37 @@
 import React, { useCallback } from "react";
+import { MAIN_CONTAINER } from "src/base/const";
 import { EWindowName } from "src/base/const/type.d";
-import { useService } from "src/base/service-manager";
-import { WindowService, ExtensionsService } from "src/render/services";
+import useObservable from "src/base/react-helper/useObservable";
+import { TRemoteService, useService } from "src/base/service-manager";
+import { ComponentEntityService, WindowService } from "src/render/services";
 
 const windowService = useService<WindowService>("WindowService");
-const extensionsService = useService<ExtensionsService>("ExtensionsService");
+const componentEntityService = useService<
+  TRemoteService<ComponentEntityService>
+>("ComponentEntityService", EWindowName.Main);
 
 const Preview = (props) => {
-  const { onChange, content = "" } = props;
+  const componentEntityMap = useObservable(
+    componentEntityService.$componentEntityMap,
+    {
+      defaultValue: {},
+    }
+  );
+  console.log(
+    "taozhizhu ~🚀 file: index.tsx ~🚀 line 20 ~🚀 Preview ~🚀 componentEntityMap",
+    componentEntityMap
+  );
 
-  const onClick = useCallback(() => {
-    const a = onChange(123);
-    loggerService.log(
-      "taozhizhu ~🚀 file: index.tsx ~🚀 line 13 ~🚀 onClick ~🚀 a",
-      a
+  const onClick = useCallback(async () => {
+    const result = await componentEntityService.getAllChildNodes(
+      MAIN_CONTAINER
+    );
+    console.log(
+      "taozhizhu ~🚀 file: index.tsx ~🚀 line 28 ~🚀 onClick ~🚀 result",
+      result
     );
   }, []);
-  return <button onClick={onClick}>{content || Preview}</button>;
+  return <button onClick={onClick}>1</button>;
 };
 
 export default windowService.windowWrap(Preview, EWindowName.Preview);

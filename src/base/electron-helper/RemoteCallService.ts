@@ -280,7 +280,14 @@ class RemoteCallService {
 }
 
 /** 自定义的BehaviorSubject当值是 "!@#$%^&*()" 时不触发subscribe的回调*/
-class CustomBehaviorSubject<T> extends BehaviorSubject<T> {
+export class CustomBehaviorSubject<T> extends BehaviorSubject<T> {
+  getValue(): T {
+    const value = super.getValue() as any;
+
+    if (value === CUSTOM_BEHAVIOR_SUBJECTINIT_VALUE) return null;
+
+    return value;
+  }
   subscribe(cb) {
     if (cb instanceof Function) {
       const _cb = cb;

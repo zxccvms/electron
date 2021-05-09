@@ -9,9 +9,9 @@ import AttrBar from "./attrBar";
 const Workbench = () => {
   return (
     <Panel flexDirection="column" height="100%">
-      {/* <Panel flex="0 0 100px">
+      <Panel flex="0 0 20px" borderBottom="1px solid #666">
         <ToolBar />
-      </Panel> */}
+      </Panel>
       <Panel flex="1">
         <SideBar />
         <Editor />
