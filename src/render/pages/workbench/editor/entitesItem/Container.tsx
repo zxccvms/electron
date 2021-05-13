@@ -14,7 +14,7 @@ import {
 } from "src/render/services/editor/type.d";
 import EntityItem from "./index";
 
-import styles from "./style/container.less";
+import style from "./style/container.less";
 
 const componentEntityService = useService<ComponentEntityService>(
   "ComponentEntityService"
@@ -30,7 +30,7 @@ interface IContainerProps {
 const Container: React.FC<IContainerProps> = (props) => {
   const { componentEntity, onClick = noop, isActive = false } = props;
   const { id, attrNode, childNode = [] } = componentEntity;
-  const { tag, style } = attrNode;
+  const { tag, styles = [] } = attrNode;
   const container = useRef<DragContainer>(null);
 
   const onInit = useCallback((node: HTMLElement) => {
@@ -80,12 +80,22 @@ const Container: React.FC<IContainerProps> = (props) => {
     }
   }, []);
 
+  const styleProp = useMemo(() => {
+    const styleProp = {};
+
+    for (const { name, value } of styles) {
+      styleProp[name] = value;
+    }
+
+    return styleProp;
+  }, [styles]);
+
   return React.createElement(
     tag,
     {
       componentid: id,
-      className: isActive ? styles.active : "",
-      style,
+      className: isActive ? style.active : "",
+      style: styleProp,
       onClick,
       ref: onInit,
     },

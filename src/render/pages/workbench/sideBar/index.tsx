@@ -17,7 +17,8 @@ const dragManagerService = useService<DragManagerService>("DragManagerService");
 
 const SideBar = () => {
   const componentModelMap = useObservable(
-    componentModelService.$componentModelMap
+    componentModelService.$componentModelMap,
+    { useDebounce: true }
   );
   const container = useRef<DragContainer>(null);
 

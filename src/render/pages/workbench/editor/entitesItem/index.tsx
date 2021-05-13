@@ -20,7 +20,9 @@ interface IEntitesItemProps {
 
 const EntityItem: React.FC<IEntitesItemProps> = (props) => {
   const { componentEntity } = props;
-  const selectedIds = useObservable(componentEntityService.$selectedIds);
+  const selectedIds = useObservable(componentEntityService.$selectedIds, {
+    useDebounce: true,
+  });
 
   const isActive = useMemo(
     () => selectedIds.indexOf(componentEntity.id) !== -1,

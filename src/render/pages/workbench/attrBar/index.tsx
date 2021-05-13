@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { If } from "src/base/react-helper/judge";
 import useObservable from "src/base/react-helper/useObservable";
 import { useService } from "src/base/service-manager";
@@ -14,7 +14,9 @@ const AttrBar = () => {
   const componentMap = useObservable(
     componentEntityService.$componentEntityMap
   );
-  const selectedIds = useObservable(componentEntityService.$selectedIds);
+  const selectedIds = useObservable(componentEntityService.$selectedIds, {
+    useDebounce: true,
+  });
 
   const componentEntity = useMemo(() => {
     if (selectedIds.length !== 1) return null;

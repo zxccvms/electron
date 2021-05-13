@@ -2,7 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import LoggerService from "src/base/js-helper/LoggerService";
 import { injectable } from "src/base/service-manager";
 import componentModels from "./componentModels";
-import { EComponentMode, TComponentModel } from "./type.d";
+import { EComponentMode, TComponentModel, TComponentModelMap } from "./type.d";
 
 @injectable("ComponentModelService", {
   isPreposition: true,
@@ -11,9 +11,9 @@ class ComponentModelService {
   private _loggerService = new LoggerService("ComponentModelService");
 
   /** 组件模型 */
-  $componentModelMap: BehaviorSubject<{
-    [type: string]: TComponentModel<EComponentMode>;
-  }> = new BehaviorSubject({});
+  $componentModelMap: BehaviorSubject<TComponentModelMap> = new BehaviorSubject(
+    {}
+  );
 
   constructor() {
     this.registerComponentModels(componentModels);

@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   EComponentMode,
   TComponentEntity,
 } from "src/render/services/editor/type.d";
 
-import styles from "./style/content.less";
+import style from "./style/content.less";
 
 interface IContentProps {
   componentEntity: TComponentEntity<EComponentMode.container>;
@@ -15,14 +15,24 @@ interface IContentProps {
 const Content: React.FC<IContentProps> = (props) => {
   const { componentEntity, onClick = noop, isActive = false } = props;
   const { id, attrNode, childNode } = componentEntity;
-  const { tag, style } = attrNode;
+  const { tag, styles = [] } = attrNode;
+
+  const styleProp = useMemo(() => {
+    const styleProp = {};
+
+    for (const { name, value } of styles) {
+      styleProp[name] = value;
+    }
+
+    return styleProp;
+  }, [styles]);
 
   return React.createElement(
     tag,
     {
       componentid: id,
-      className: isActive ? styles.active : "",
-      style,
+      className: isActive ? style.active : "",
+      style: styleProp,
       onClick,
     },
     [childNode]

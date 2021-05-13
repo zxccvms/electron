@@ -7,11 +7,14 @@ import {
   EComponentMode,
   TEtityPosition,
   TComponentEntityMap,
+  TAttrItemPosition,
+  TAttrItem,
 } from "./type.d";
 import { mergeDeepLeft, clone } from "ramda";
 import { BehaviorSubject } from "rxjs";
 import { redoOrNext } from "src/base/js-helper/loop";
 import { MAIN_CONTAINER } from "src/base/const";
+import { PartialPlus } from "src/base/const/type";
 
 const ID_LENGTH = 5;
 
@@ -21,15 +24,15 @@ class ComponentEntityService {
   private _loggerService = new LoggerService("ComponentEntityService");
 
   /** 组件实例的映射表 */
-  $componentEntityMap: BehaviorSubject<TComponentEntityMap> = new BehaviorSubject(
-    {}
-  );
+  $componentEntityMap: BehaviorSubject<TComponentEntityMap> =
+    new BehaviorSubject({});
   /** 选择的组件id列表 */
   $selectedIds: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
   /** 创建组件实例 */
   createComponentEntity(type: string): TComponentEntity<EComponentMode> {
-    const componentModelMap = this.componentModelService.$componentModelMap.getValue();
+    const componentModelMap =
+      this.componentModelService.$componentModelMap.getValue();
     const componentModel = componentModelMap[type];
 
     if (!componentModel) {
@@ -51,13 +54,36 @@ class ComponentEntityService {
   }
 
   /** 更新实例 */
-  updateComponentEntity(id: string, params: any) {
+  updateComponentEntity(
+    id: string,
+    params: PartialPlus<TComponentEntity<EComponentMode>>
+  ) {
     const componentEntity = this.getComponentEntityById(id);
     if (!componentEntity) return;
 
     const newComponentEntity = mergeDeepLeft(params, componentEntity);
 
     this._updateComponentEntityMap([newComponentEntity]);
+  }
+
+  /** 更新实例属性项 */
+  updateComponentEntityAttrItem(
+    position: TAttrItemPosition,
+    params: PartialPlus<TAttrItem<any>>
+  ) {
+    const { id, key, index } = position;
+    const componentEntity = this.getComponentEntityById(id);
+    if (!componentEntity) return;
+
+    const attrs = componentEntity.attrNode[key] as TAttrItem<any>[];
+
+    attrs[index] = mergeDeepLeft(params, attrs[index]);
+
+    this.updateComponentEntity(id, {
+      attrNode: {
+        [key]: [...attrs],
+      },
+    });
   }
 
   /** 在容器中插入实例 */

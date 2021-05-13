@@ -8,10 +8,16 @@ const componentContainerModels: TComponentModel<EComponentMode.container>[] = [
     mode: EComponentMode.container,
     attrNode: {
       tag: "div",
-      style: {
-        width: "100%",
-        height: "100%",
-      },
+      styles: [
+        {
+          name: "width",
+          value: "100%",
+        },
+        {
+          name: "height",
+          value: "100%",
+        },
+      ],
     },
     childNode: [],
   },
@@ -21,11 +27,20 @@ const componentContainerModels: TComponentModel<EComponentMode.container>[] = [
     mode: EComponentMode.container,
     attrNode: {
       tag: "div",
-      style: {
-        width: "100px",
-        height: "100px",
-        border: "1px solid #666",
-      },
+      styles: [
+        {
+          name: "width",
+          value: "100px",
+        },
+        {
+          name: "height",
+          value: "100px",
+        },
+        {
+          name: "border",
+          value: "1px solid #666",
+        },
+      ],
     },
     childNode: [],
   },
@@ -38,9 +53,12 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
     mode: EComponentMode.content,
     attrNode: {
       tag: "span",
-      style: {
-        color: "#666",
-      },
+      styles: [
+        {
+          name: "color",
+          value: "#666",
+        },
+      ],
     },
     childNode: "span",
   },
@@ -50,9 +68,12 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
     mode: EComponentMode.content,
     attrNode: {
       tag: "p",
-      style: {
-        color: "#666",
-      },
+      styles: [
+        {
+          name: "color",
+          value: "#666",
+        },
+      ],
     },
     childNode: "p",
   },

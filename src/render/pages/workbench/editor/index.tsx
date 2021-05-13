@@ -15,10 +15,7 @@ const componentEntityService = useService<ComponentEntityService>(
 
 const Editor = () => {
   const componentEntityMap = useObservable(
-    componentEntityService.$componentEntityMap,
-    {
-      useDebounce: false,
-    }
+    componentEntityService.$componentEntityMap
   );
 
   const mainContainerEntity = useMemo(

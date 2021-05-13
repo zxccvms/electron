@@ -9,9 +9,12 @@ type TOptions = {
 };
 
 /** 使用Subject类型的数据流 */
-function useObservable<T>(subject: Subject<T>, options?: TOptions): T {
-  const { defaultValue = undefined, useDebounce = true, timeout = 50 } =
-    options || {};
+function useObservable<T>(subject: Subject<T>, options = {} as TOptions): T {
+  const {
+    defaultValue = undefined,
+    useDebounce = false,
+    timeout = 50,
+  } = options;
   const [state, setState] = useState(
     subject instanceof BehaviorSubject && defaultValue === undefined
       ? subject.getValue()
@@ -19,9 +22,8 @@ function useObservable<T>(subject: Subject<T>, options?: TOptions): T {
   );
 
   useEffect(() => {
-    const subscription = (useDebounce
-      ? subject.pipe(debounce(() => timer(timeout)))
-      : subject
+    const subscription = (
+      useDebounce ? subject.pipe(debounce(() => timer(timeout))) : subject
     ).subscribe(setState);
 
     return () => subscription.unsubscribe();

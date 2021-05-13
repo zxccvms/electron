@@ -5,11 +5,27 @@ export enum EComponentMode {
   container = "container",
 }
 
+export enum EDisplayType {}
+
+export enum EWrapperType {}
+
+/** 属性项 */
+export type TAttrItem<T> = {
+  name: keyof T;
+  value: T[keyof T];
+  displayType?: EDisplayType;
+  displayParam?: any;
+  wrapperType?: EWrapperType;
+  wrapperParam?: any;
+};
+
+/** 属性节点 */
 export type TAttrNode = {
   /** 标签名 */
   tag: string;
   /** 样式属性 */
-  style: React.CSSProperties;
+  styles?: TAttrItem<React.CSSProperties>[];
+  options?: TAttrItem<any>[];
 };
 
 /** 组件模型 */
@@ -23,6 +39,11 @@ export type TComponentModel<T extends EComponentMode> = {
   childNode: T extends EComponentMode.container ? string[] : string;
 };
 
+export type TComponentModelMap = {
+  [id: string]: TComponentModel<EComponentMode>;
+};
+
+/** 组件实例 */
 export type TComponentEntity<T extends EComponentMode> = {
   id: string;
   type: string;
@@ -37,12 +58,18 @@ export type TComponentEntityMap = {
   [id: string]: TComponentEntity<EComponentMode>;
 };
 
+/** 实例在父节点中的定位 */
 export type TEtityPosition = {
   entityId: string;
   index: number;
 };
 
-export type TAttr = {
-  name: string;
-  value: any;
+/** 实例属性的定位 */
+export type TAttrItemPosition = {
+  /** 实例id */
+  id: string;
+  /** AttrNode下的key名 */
+  key: string;
+  /** 在AttrItem列表索引 */
+  index: number;
 };

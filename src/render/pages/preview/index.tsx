@@ -15,11 +15,8 @@ const Preview = (props) => {
     componentEntityService.$componentEntityMap,
     {
       defaultValue: {},
+      useDebounce: true,
     }
-  );
-  console.log(
-    "taozhizhu ~🚀 file: index.tsx ~🚀 line 20 ~🚀 Preview ~🚀 componentEntityMap",
-    componentEntityMap
   );
 
   const onClick = useCallback(async () => {

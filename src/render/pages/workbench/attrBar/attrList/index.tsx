@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import {
   EComponentMode,
-  TAttr,
+  TAttrNode,
   TComponentEntity,
 } from "src/render/services/editor/type.d";
 import { Panel } from "ui-lib";
@@ -19,39 +19,29 @@ interface IAttrListProps {
 
 const AttrList: React.FC<IAttrListProps> = (props) => {
   const { componentEntity } = props;
-  const { attrNode } = componentEntity;
-  const { style } = attrNode;
+  const { styles = [] } = componentEntity.attrNode;
 
-  const attrs: TAttr[] = useMemo(() => {
-    const attrs = [];
-    for (const key in style) {
-      attrs.push({
-        name: key,
-        value: style[key],
-      });
-    }
-
-    return attrs;
-  }, [style]);
-
-  const onChange = useCallback((name, value) => {
-    componentEntityService.updateComponentEntity(componentEntity.id, {
-      attrNode: {
-        style: {
-          [name]: value,
-        },
+  const onChange = useCallback((key: keyof TAttrNode, index, value) => {
+    componentEntityService.updateComponentEntityAttrItem(
+      {
+        id: componentEntity.id,
+        key,
+        index,
       },
-    });
+      {
+        value,
+      }
+    );
   }, []);
 
   return (
     <Panel flexDirection="column">
-      {attrs.map((attr) => (
+      {styles.map((attrItem, index) => (
         <AttrItem
-          attr={attr}
-          onChange={(value) => onChange(attr.name, value)}
+          attrItem={attrItem}
+          onChange={(value) => onChange("styles", index, value)}
           componentEntity={componentEntity}
-          key={attr.name}
+          key={attrItem.name}
         />
       ))}
     </Panel>
