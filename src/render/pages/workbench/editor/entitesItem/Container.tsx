@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef } from "react";
 import { useService } from "src/base/service-manager";
 import {
   ComponentEntityService,
+  ComponentHandlerService,
   DragManagerService,
 } from "src/render/services";
 import DragContainer, {
@@ -19,6 +20,9 @@ import style from "./style/container.less";
 const componentEntityService = useService<ComponentEntityService>(
   "ComponentEntityService"
 );
+const componentHandlerService = useService<ComponentHandlerService>(
+  "ComponentHandlerService"
+);
 const dragManagerService = useService<DragManagerService>("DragManagerService");
 
 interface IContainerProps {
@@ -29,8 +33,8 @@ interface IContainerProps {
 
 const Container: React.FC<IContainerProps> = (props) => {
   const { componentEntity, onClick = noop, isActive = false } = props;
-  const { id, attrNode, childNode = [] } = componentEntity;
-  const { tag, styles = [] } = attrNode;
+  const { id, tag, attrNode, childNode = [] } = componentEntity;
+  const { styles = [] } = attrNode;
   const container = useRef<DragContainer>(null);
 
   const onInit = useCallback((node: HTMLElement) => {
@@ -81,13 +85,7 @@ const Container: React.FC<IContainerProps> = (props) => {
   }, []);
 
   const styleProp = useMemo(() => {
-    const styleProp = {};
-
-    for (const { name, value } of styles) {
-      styleProp[name] = value;
-    }
-
-    return styleProp;
+    return componentHandlerService.stylesAttrItemToStyleProp(styles);
   }, [styles]);
 
   return React.createElement(

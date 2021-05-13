@@ -63,7 +63,8 @@ module.exports = {
     new webpack.ProvidePlugin({
       empty: [globalFilePath, 'empty'],
       noop: [globalFilePath, 'noop'],
-      loggerService: [globalFilePath, 'loggerService']
+      loggerService: [globalFilePath, 'loggerService'],
+      judgeType: [globalFilePath, 'judgeType']
     })
   ],
 }

@@ -2,4 +2,8 @@ export { default as ExtensionsService } from "./extensions/ExtensionsService";
 export { default as WindowService } from "./window/WindowService";
 export { default as ComponentModelService } from "./editor/ComponentModelService";
 export { default as ComponentEntityService } from "./editor/ComponentEntityService";
+export { default as ComponentHandlerService } from "./editor/ComponentHandlerService";
 export { default as DragManagerService } from "./drag/DragManagerService";
+export { default as BabelService } from "./babel/BabelService";
+export { default as CodeGeneraterService } from "./babel/CodeGeneraterService";
+export { default as ASTGeneraterService } from "./babel/ASTGeneraterService";

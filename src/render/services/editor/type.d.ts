@@ -21,8 +21,6 @@ export type TAttrItem<T> = {
 
 /** 属性节点 */
 export type TAttrNode = {
-  /** 标签名 */
-  tag: string;
   /** 样式属性 */
   styles?: TAttrItem<React.CSSProperties>[];
   options?: TAttrItem<any>[];
@@ -32,6 +30,8 @@ export type TAttrNode = {
 export type TComponentModel<T extends EComponentMode> = {
   type: string;
   label: string;
+  /** 元素标签名 */
+  tag: string;
   mode: T;
   /** 属性节点 */
   attrNode: TAttrNode;
@@ -48,6 +48,7 @@ export type TComponentEntity<T extends EComponentMode> = {
   id: string;
   type: string;
   label: string;
+  tag: string;
   mode: T;
   attrNode: TAttrNode;
   parentNode: string;

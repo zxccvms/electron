@@ -5,9 +5,9 @@ const componentContainerModels: TComponentModel<EComponentMode.container>[] = [
   {
     type: MAIN_CONTAINER,
     label: MAIN_CONTAINER,
+    tag: "div",
     mode: EComponentMode.container,
     attrNode: {
-      tag: "div",
       styles: [
         {
           name: "width",
@@ -24,9 +24,9 @@ const componentContainerModels: TComponentModel<EComponentMode.container>[] = [
   {
     type: "div",
     label: "div",
+    tag: "div",
     mode: EComponentMode.container,
     attrNode: {
-      tag: "div",
       styles: [
         {
           name: "width",
@@ -50,9 +50,9 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
   {
     type: "span",
     label: "span",
+    tag: "span",
     mode: EComponentMode.content,
     attrNode: {
-      tag: "span",
       styles: [
         {
           name: "color",
@@ -69,9 +69,9 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
   {
     type: "p",
     label: "p",
+    tag: "p",
     mode: EComponentMode.content,
     attrNode: {
-      tag: "p",
       styles: [
         {
           name: "color",
