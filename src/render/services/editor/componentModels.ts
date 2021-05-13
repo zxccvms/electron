@@ -58,6 +58,10 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
           name: "color",
           value: "#666",
         },
+        {
+          name: "fontSize",
+          value: "18px",
+        },
       ],
     },
     childNode: "span",
@@ -72,6 +76,10 @@ const componentContentModels: TComponentModel<EComponentMode.content>[] = [
         {
           name: "color",
           value: "#666",
+        },
+        {
+          name: "fontSize",
+          value: "18px",
         },
       ],
     },

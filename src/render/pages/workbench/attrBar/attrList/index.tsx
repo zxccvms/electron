@@ -21,18 +21,21 @@ const AttrList: React.FC<IAttrListProps> = (props) => {
   const { componentEntity } = props;
   const { styles = [] } = componentEntity.attrNode;
 
-  const onChange = useCallback((key: keyof TAttrNode, index, value) => {
-    componentEntityService.updateComponentEntityAttrItem(
-      {
-        id: componentEntity.id,
-        key,
-        index,
-      },
-      {
-        value,
-      }
-    );
-  }, []);
+  const onChange = useCallback(
+    (key: keyof TAttrNode, index, value) => {
+      componentEntityService.updateComponentEntityAttrItem(
+        {
+          id: componentEntity.id,
+          key,
+          index,
+        },
+        {
+          value,
+        }
+      );
+    },
+    [componentEntity]
+  );
 
   return (
     <Panel flexDirection="column">

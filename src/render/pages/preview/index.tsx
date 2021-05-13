@@ -1,11 +1,12 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { MAIN_CONTAINER } from "src/base/const";
 import { EWindowName } from "src/base/const/type.d";
+import { If } from "src/base/react-helper/judge";
 import useObservable from "src/base/react-helper/useObservable";
 import { TRemoteService, useService } from "src/base/service-manager";
-import { ComponentEntityService, WindowService } from "src/render/services";
+import { ComponentEntityService } from "src/render/services";
+import Entity from "./Entity";
 
-const windowService = useService<WindowService>("WindowService");
 const componentEntityService = useService<
   TRemoteService<ComponentEntityService>
 >("ComponentEntityService", EWindowName.Main);
@@ -19,16 +20,17 @@ const Preview = (props) => {
     }
   );
 
-  const onClick = useCallback(async () => {
-    const result = await componentEntityService.getAllChildNodes(
-      MAIN_CONTAINER
-    );
-    console.log(
-      "taozhizhu ~🚀 file: index.tsx ~🚀 line 28 ~🚀 onClick ~🚀 result",
-      result
-    );
-  }, []);
-  return <button onClick={onClick}>1</button>;
+  return (
+    <If
+      condition={Boolean(componentEntityMap[MAIN_CONTAINER])}
+      render={() => (
+        <Entity
+          componentEntityMap={componentEntityMap}
+          componentEntity={componentEntityMap[MAIN_CONTAINER]}
+        />
+      )}
+    />
+  );
 };
 
-export default windowService.windowWrap(Preview, EWindowName.Preview);
+export default Preview;
