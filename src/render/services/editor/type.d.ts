@@ -1,3 +1,5 @@
+import { MAIN_CONTAINER } from "src/base/const";
+
 export enum EComponentMode {
   /** 内容类型 */
   content = "content",
@@ -23,7 +25,6 @@ export type TAttrItem<T> = {
 export type TAttrNode = {
   /** 样式属性 */
   styles?: TAttrItem<React.CSSProperties>[];
-  options?: TAttrItem<any>[];
 };
 
 /** 组件模型 */
@@ -43,19 +44,34 @@ export type TComponentModelMap = {
   [id: string]: TComponentModel<EComponentMode>;
 };
 
+/** 组件实例在code中的信息 */
+export type TLoc = {
+  /** 所属文件的文件名 */
+  fileName?: string;
+  /** 起始信息 */
+  start: {
+    line: number;
+    colum?: number;
+  };
+  /** 结尾信息 */
+  end: {
+    line: number;
+    colum?: number;
+  };
+};
+
 /** 组件实例 */
-export type TComponentEntity<T extends EComponentMode> = {
+export type TComponentEntity<T extends EComponentMode> = TComponentModel<T> & {
+  /** 实例自身id */
   id: string;
-  type: string;
-  label: string;
-  tag: string;
-  mode: T;
-  attrNode: TAttrNode;
+  /** 父实例的id */
   parentNode: string;
-  childNode: T extends EComponentMode.container ? string[] : string;
+  /** 组件实例在code中的信息 */
+  loc: TLoc;
 };
 
 export type TComponentEntityMap = {
+  [MAIN_CONTAINER]?: TComponentEntity<EComponentMode.container>;
   [id: string]: TComponentEntity<EComponentMode>;
 };
 

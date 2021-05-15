@@ -9,6 +9,7 @@ import {
   TComponentEntityMap,
   TAttrItemPosition,
   TAttrItem,
+  TLoc,
 } from "./type.d";
 import { mergeDeepLeft, clone } from "ramda";
 import { BehaviorSubject } from "rxjs";
@@ -25,12 +26,19 @@ class ComponentEntityService {
 
   /** 组件实例的映射表 */
   $componentEntityMap: BehaviorSubject<TComponentEntityMap> =
-    new BehaviorSubject({});
+    new BehaviorSubject({
+      MAIN_CONTAINER: this.createComponentEntity(
+        MAIN_CONTAINER
+      ) as TComponentEntity<EComponentMode.container>,
+    });
   /** 选择的组件id列表 */
   $selectedIds: BehaviorSubject<string[]> = new BehaviorSubject([]);
 
   /** 创建组件实例 */
-  createComponentEntity(type: string): TComponentEntity<EComponentMode> {
+  createComponentEntity(
+    type: string,
+    params: PartialPlus<TComponentEntity<EComponentMode>> = {}
+  ): TComponentEntity<EComponentMode> {
     const componentModelMap =
       this.componentModelService.$componentModelMap.getValue();
     const componentModel = componentModelMap[type];
@@ -43,13 +51,17 @@ class ComponentEntityService {
     }
 
     const id = type === MAIN_CONTAINER ? MAIN_CONTAINER : this._createSoleId();
-    const componentEntites = {
-      ...clone(componentModel),
+    const componentEntites: TComponentEntity<EComponentMode> = {
+      loc: null,
+      ...mergeDeepLeft(params, {
+        ...clone(componentModel),
+        parentNode: null,
+      }),
       id,
-      parentNode: null,
     };
 
-    this._updateComponentEntityMap([componentEntites]);
+    if (type !== MAIN_CONTAINER)
+      this._updateComponentEntityMap([componentEntites]);
     return componentEntites;
   }
 
@@ -155,6 +167,50 @@ class ComponentEntityService {
     }
 
     return componentEntites;
+  }
+
+  /** 通过loc信息找实例 */
+  getComponentEntityByLoc(
+    targetLoc: TLoc,
+    rootEntityId: string = MAIN_CONTAINER
+  ): TComponentEntity<EComponentMode> {
+    const rootEntity = this.getComponentEntityById(rootEntityId);
+    const { mode, loc: rootLoc, childNode } = rootEntity;
+    const { fileName, start, end } = targetLoc;
+
+    if (rootLoc) {
+      if (fileName !== rootLoc.fileName) {
+        this._loggerService.warn(
+          `getComponentEntityByLoc warn: fileName is different, source file's name is ${rootLoc.fileName}, target file's name is ${fileName}`
+        );
+        return null;
+      }
+
+      if (
+        start.line < rootLoc.start.line &&
+        start.colum < rootLoc.start.colum &&
+        end.line > rootLoc.end.line &&
+        end.colum > rootLoc.end.colum
+      )
+        return null;
+
+      if (
+        start.line === rootLoc.start.line &&
+        start.colum === rootLoc.start.colum &&
+        end.line === rootLoc.end.line &&
+        end.colum === rootLoc.end.colum
+      )
+        return rootEntity;
+    }
+
+    if (mode === EComponentMode.container) {
+      for (const childId of childNode) {
+        const childEntity = this.getComponentEntityByLoc(targetLoc, childId);
+        if (childEntity) return childEntity;
+      }
+    }
+
+    return null;
   }
 
   /** 删除实例 */

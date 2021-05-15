@@ -4,6 +4,9 @@ export { default as ComponentModelService } from "./editor/ComponentModelService
 export { default as ComponentEntityService } from "./editor/ComponentEntityService";
 export { default as ComponentHandlerService } from "./editor/ComponentHandlerService";
 export { default as DragManagerService } from "./drag/DragManagerService";
-export { default as BabelService } from "./babel/BabelService";
+export { default as CodeResolverService } from "./babel/CodeResolverService";
 export { default as CodeGeneraterService } from "./babel/CodeGeneraterService";
 export { default as ASTGeneraterService } from "./babel/ASTGeneraterService";
+export { default as NodeResolverService } from "./babel/NodeResolverService";
+export { default as ASTResolverService } from "./babel/ASTResolverService";
+export { default as ASTManagerService } from "./babel/ASTManagerService";

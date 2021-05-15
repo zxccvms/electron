@@ -23,7 +23,7 @@ const codeGeneraterService = useService<CodeGeneraterService>(
 );
 
 interface IContentProps {
-  componentEntity: TComponentEntity<EComponentMode.container>;
+  componentEntity: TComponentEntity<EComponentMode.content>;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   isActive?: boolean;
 }
@@ -37,10 +37,10 @@ const Content: React.FC<IContentProps> = (props) => {
     return componentHandlerService.stylesAttrItemToStyleProp(styles);
   }, [styles]);
 
-  const ast = aSTGeneraterService.transformToAST(componentEntity);
-  console.log("taozhizhu ~🚀 file: Content.tsx ~🚀 line 32 ~🚀 ast", ast);
-  const code = codeGeneraterService.transformToCode(ast);
-  console.log("taozhizhu ~🚀 file: Content.tsx ~🚀 line 43 ~🚀 code", code);
+  // const ast = aSTGeneraterService.transformToAST(componentEntity);
+  // console.log("taozhizhu ~🚀 file: Content.tsx ~🚀 line 32 ~🚀 ast", ast);
+  // const code = codeGeneraterService.transformToCode(ast);
+  // console.log("taozhizhu ~🚀 file: Content.tsx ~🚀 line 43 ~🚀 code", code);
 
   return React.createElement(
     tag,

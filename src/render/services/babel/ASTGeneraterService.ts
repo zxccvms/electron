@@ -5,21 +5,40 @@ import {
 import * as types from "@babel/types";
 import { inject, injectable } from "src/base/service-manager";
 import CodeGeneraterService from "./CodeGeneraterService";
-import { ComponentHandlerService } from "..";
+import {
+  ComponentEntityService,
+  ComponentHandlerService,
+} from "src/render/services";
+import { MAIN_CONTAINER } from "src/base/const";
 
 /** 语法树生成器 */
-@injectable("ASTGeneraterService")
+@injectable("ASTGeneraterService", {
+  isPreposition: true,
+})
 class ASTGeneraterService {
   @inject("CodeGeneraterService") codeGeneraterService: CodeGeneraterService;
   @inject("ComponentHandlerService")
   componentHandlerService: ComponentHandlerService;
+  @inject("ComponentEntityService")
+  componentEntityService: ComponentEntityService;
+
+  _constructor() {
+    this.componentEntityService.$componentEntityMap.subscribe((entityMap) => {
+      const ast = this.transformToAST(entityMap[MAIN_CONTAINER]);
+      const code = this.codeGeneraterService.transformToCode(ast);
+      console.log(
+        "taozhizhu ~🚀 file: ASTGeneraterService.ts ~🚀 line 29 ~🚀 ASTGeneraterService ~🚀 this.componentEntityService.$componentEntityMap.subscribe ~🚀 code",
+        code
+      );
+    });
+  }
 
   /** 组件实例转AST */
   transformToAST(
     componentEntity: TComponentEntity<EComponentMode>
   ): types.JSXElement {
     const { tag, mode, attrNode, childNode } = componentEntity;
-    const { styles = [], options = [] } = attrNode;
+    const { styles = [] } = attrNode;
 
     const attributes = [];
     if (styles.length) {
@@ -28,23 +47,24 @@ class ASTGeneraterService {
       const styleAttribute = this._createJSXAttribute("style", style);
       attributes.push(styleAttribute);
     }
-    if (options.length) {
-      // todo
-    }
 
     let children = [];
     if (mode === EComponentMode.content) {
       const jsxText = this._createJSXText(childNode as string);
       children.push(jsxText);
     } else if (mode === EComponentMode.container) {
-      // todo
+      children = (childNode as string[]).map((childId) => {
+        const childEntity =
+          this.componentEntityService.getComponentEntityById(childId);
+        return this.transformToAST(childEntity);
+      });
     }
 
-    return this._createJSXElementNode(tag, attributes, children);
+    return this._createJSXElement(tag, attributes, children);
   }
 
   /** 创建JSX节点 */
-  private _createJSXElementNode(
+  private _createJSXElement(
     tag: string,
     attributes: (types.JSXAttribute | types.JSXSpreadAttribute)[] = [],
     children: (
