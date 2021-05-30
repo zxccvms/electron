@@ -7,14 +7,13 @@ import {
 import { Panel } from "ui-lib";
 import AttrItem from "./AttrItem";
 import { useService } from "src/base/service-manager";
-import { ComponentEntityService } from "src/render/services";
 
 const componentEntityService = useService<ComponentEntityService>(
   "ComponentEntityService"
 );
 
 interface IAttrListProps {
-  componentEntity: TComponentEntity<EComponentMode>;
+  componentEntity: TComponentEntity;
 }
 
 const AttrList: React.FC<IAttrListProps> = (props) => {

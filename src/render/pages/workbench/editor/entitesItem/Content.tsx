@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useService } from "src/base/service-manager";
 import {
-  ASTGeneraterService,
+  AstGeneraterService,
   CodeGeneraterService,
   ComponentHandlerService,
 } from "src/render/services";
@@ -15,8 +15,8 @@ import style from "./style/content.less";
 const componentHandlerService = useService<ComponentHandlerService>(
   "ComponentHandlerService"
 );
-const aSTGeneraterService = useService<ASTGeneraterService>(
-  "ASTGeneraterService"
+const astGeneraterService = useService<AstGeneraterService>(
+  "AstGeneraterService"
 );
 const codeGeneraterService = useService<CodeGeneraterService>(
   "CodeGeneraterService"
@@ -37,7 +37,7 @@ const Content: React.FC<IContentProps> = (props) => {
     return componentHandlerService.stylesAttrItemToStyleProp(styles);
   }, [styles]);
 
-  // const ast = aSTGeneraterService.transformToAST(componentEntity);
+  // const ast = astGeneraterService.transformToAst(componentEntity);
   // console.log("taozhizhu ~🚀 file: Content.tsx ~🚀 line 32 ~🚀 ast", ast);
   // const code = codeGeneraterService.transformToCode(ast);
   // console.log("taozhizhu ~🚀 file: Content.tsx ~🚀 line 43 ~🚀 code", code);

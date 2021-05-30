@@ -12,7 +12,7 @@ export enum EDisplayType {}
 export enum EWrapperType {}
 
 /** 属性项 */
-export type TAttrItem<T> = {
+export type TAttrItem<T = {}> = {
   name: keyof T;
   value: T[keyof T];
   displayType?: EDisplayType;
@@ -28,7 +28,7 @@ export type TAttrNode = {
 };
 
 /** 组件模型 */
-export type TComponentModel<T extends EComponentMode> = {
+export type TComponentModel<T extends EComponentMode = EComponentMode> = {
   type: string;
   label: string;
   /** 元素标签名 */
@@ -41,7 +41,7 @@ export type TComponentModel<T extends EComponentMode> = {
 };
 
 export type TComponentModelMap = {
-  [id: string]: TComponentModel<EComponentMode>;
+  [id: string]: TComponentModel;
 };
 
 /** 组件实例在code中的信息 */
@@ -61,18 +61,19 @@ export type TLoc = {
 };
 
 /** 组件实例 */
-export type TComponentEntity<T extends EComponentMode> = TComponentModel<T> & {
-  /** 实例自身id */
-  id: string;
-  /** 父实例的id */
-  parentNode: string;
-  /** 组件实例在code中的信息 */
-  loc: TLoc;
-};
+export type TComponentEntity<T extends EComponentMode = EComponentMode> =
+  TComponentModel<T> & {
+    /** 实例自身id */
+    id: string;
+    /** 父实例的id */
+    parentNode: string;
+    /** 组件实例在code中的信息 */
+    loc: TLoc;
+  };
 
 export type TComponentEntityMap = {
   [MAIN_CONTAINER]?: TComponentEntity<EComponentMode.container>;
-  [id: string]: TComponentEntity<EComponentMode>;
+  [id: string]: TComponentEntity;
 };
 
 /** 实例在父节点中的定位 */

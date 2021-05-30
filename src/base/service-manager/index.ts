@@ -2,7 +2,6 @@ import { capitalizeTheFirstLetter } from "src/base/js-helper/string";
 import remoteCallService from "src/base/electron-helper/RemoteCallService";
 import { Subject } from "rxjs";
 import { MAIN_PROCESS } from "src/base/const";
-import { Filter } from "src/base/const/type.d";
 
 const currentWindowName = remoteCallService.currentWindowName;
 

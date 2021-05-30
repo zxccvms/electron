@@ -4,8 +4,8 @@ import ReactDom from "react-dom";
 import { remote } from "electron";
 import { useService } from "src/base/service-manager";
 import { WindowService } from "src/render/services";
-import { EWindowName } from "src/base/const/type.d";
 import { asyncWrapper } from "src/base/react-helper/asyncWrapper";
+import { EWindowName } from "src/base/const/types.d";
 
 const pageConfigMap = {
   [EWindowName.Preview]: {

@@ -15,7 +15,7 @@ const componentEntityService = useService<ComponentEntityService>(
 );
 
 interface IEntitesItemProps {
-  componentEntity: TComponentEntity<EComponentMode>;
+  componentEntity: TComponentEntity;
 }
 
 const EntityItem: React.FC<IEntitesItemProps> = (props) => {

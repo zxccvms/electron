@@ -9,7 +9,7 @@ import attrItemMap from "./attrItemMap";
 
 interface IAttrItemProps {
   attrItem: TAttrItem<any>;
-  componentEntity: TComponentEntity<EComponentMode>;
+  componentEntity: TComponentEntity;
   onChange: (value: any) => void;
 }
 

@@ -1,12 +1,12 @@
 import { remote, BrowserWindow, ipcRenderer } from "electron";
 import React from "react";
 import { inject, injectable, TRemoteService } from "src/base/service-manager";
-import { EWindowName } from "src/base/const/type.d";
 import { deepTraverse, getValueByChainKey } from "src/base/js-helper/object";
 import { MAIN_PROCESS, WINDOW_RENDER_CHANNEL_NAME } from "src/base/const";
 import { WindowGeneratorService } from "src/main/services";
 import { clone } from "ramda";
 import { randomString } from "src/base/js-helper/string";
+import { EWindowName } from "src/base/const/types.d";
 
 const CHANNEL_NAME_PLACEHOLDER = "CHANNEL_NAME";
 const matchChannelNameReg = /\$CHANNEL_NAME\$\{(.*)\}/;

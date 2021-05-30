@@ -20,9 +20,7 @@ class ComponentModelService {
   }
 
   /** 组件模型注册 */
-  registerComponentModels(
-    componentModels: TComponentModel<EComponentMode>[]
-  ): void {
+  registerComponentModels(componentModels: TComponentModel[]): void {
     const componentModelMap = this.$componentModelMap.getValue();
 
     for (const componentModel of componentModels) {

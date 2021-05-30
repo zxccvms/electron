@@ -12,7 +12,7 @@ const componentHandlerService = useService<ComponentHandlerService>(
 );
 
 interface IEntityProps {
-  componentEntity: TComponentEntity<EComponentMode>;
+  componentEntity: TComponentEntity;
   componentEntityMap: TComponentEntityMap;
 }
 

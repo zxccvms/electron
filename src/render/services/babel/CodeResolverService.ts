@@ -6,7 +6,7 @@ import * as types from "@babel/types";
 @injectable("CodeResolverService")
 class CodeResolverService {
   /** 代码转ast */
-  transformToAST(code: string): types.File {
+  transformToAst(code: string): types.File {
     return parser.parse(code, {
       sourceFilename: "index.jsx",
       sourceType: "module",

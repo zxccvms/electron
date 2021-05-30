@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { EWindowName } from "src/base/const/type.d";
+import { EWindowName } from "src/base/const/types.d";
 import { useService } from "src/base/service-manager";
 import { WindowService } from "src/render/services";
 

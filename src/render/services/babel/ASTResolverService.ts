@@ -1,13 +1,10 @@
 import { inject, injectable } from "src/base/service-manager";
 import * as types from "@babel/types";
-import {
-  NodeResolverService,
-  CodeResolverService,
-  ComponentEntityService,
-} from "src/render/services";
+import { NodeResolverService, CodeResolverService } from "src/render/services";
 import { TComponentEntityMap } from "src/render/services/editor/type.d";
 import LoggerService from "src/base/js-helper/LoggerService";
 import { MAIN_CONTAINER } from "src/base/const";
+import ComponentEntityService from "src/render/services/editor/ComponentEntityService";
 
 const code = `
 const b = <div style={{width: "90px",height: "100px", border: "2px solid #777"}}>
@@ -17,65 +14,59 @@ const b = <div style={{width: "90px",height: "100px", border: "2px solid #777"}}
 `;
 
 /** 语法树解析器 */
-@injectable("ASTResolverService", {
+@injectable("AstResolverService", {
   isPreposition: true,
 })
-class ASTResolverService {
-  @inject("ComponentEntityService")
-  componentEntityService: ComponentEntityService;
+class AstResolverService {
   @inject("CodeResolverService") codeResolverService: CodeResolverService;
   @inject("NodeResolverService") nodeResolverService: NodeResolverService;
-  private _loggerService = new LoggerService("ASTResolverService");
+  private _loggerService = new LoggerService("AstResolverService");
 
   constructor() {
-    const file = this.codeResolverService.transformToAST(code);
+    const file = this.codeResolverService.transformToAst(code);
     this.transformToComponentEntityMap(file);
   }
 
-  /** AST转组件实例 todo*/
+  /** Ast转组件实例 todo*/
   transformToComponentEntityMap(ast: types.Node): TComponentEntityMap {
+    const componentEntityService = new ComponentEntityService("");
+
     types.traverse(ast, (node, parents) => {
       switch (node.type) {
         case "JSXElement":
-          this._traverseJSXElement(node, parents);
+          this._traverseJSXElement(node, parents, componentEntityService);
       }
     });
 
-    return null;
+    return componentEntityService.$componentEntityMap.getValue();
   }
 
   /** 遍历JSXElement节点 */
   private _traverseJSXElement(
     node: types.JSXElement,
-    parents: types.TraversalAncestors
+    parents: types.TraversalAncestors,
+    componentEntityService: ComponentEntityService
   ) {
-    console.log(
-      "taozhizhu ~🚀 file: ASTResolverService.ts ~🚀 line 55 ~🚀 ASTResolverService ~🚀 _resolver ~🚀 parents",
-      JSON.parse(JSON.stringify(parents))
-    );
     const { tag, attrNode, childNode } =
       this.nodeResolverService.resolveJSXElement(node);
-    // =======demo=======
-    const { id } = this.componentEntityService.createComponentEntity(tag, {
+    const componentEntity = componentEntityService.createComponentEntity(tag, {
       attrNode,
       loc: node.loc,
       childNode,
     });
+    if (!componentEntity) return;
 
     const lastParent = parents[parents.length - 1];
     const containerId =
       lastParent.node.type === "JSXElement"
-        ? this.componentEntityService.getComponentEntityByLoc(
-            lastParent.node.loc
-          ).id
+        ? componentEntityService.getComponentEntityByLoc(lastParent.node.loc).id
         : MAIN_CONTAINER;
 
-    this.componentEntityService.insertComponentEntityInContainer(containerId, {
+    componentEntityService.insertComponentEntityInContainer(containerId, {
       index: lastParent.index || 0,
-      entityId: id,
+      entityId: componentEntity.id,
     });
-    // =======demo=======
   }
 }
 
-export default ASTResolverService;
+export default AstResolverService;

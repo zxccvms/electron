@@ -1,8 +1,8 @@
 import "./style/index.less";
 
 import { ipcRenderer, remote } from "electron";
-import { EWindowName } from "src/base/const/type";
 import { WINDOW_RENDER_CHANNEL_NAME } from "src/base/const";
+import { EWindowName } from "src/base/const/types.d";
 
 ipcRenderer.once(
   WINDOW_RENDER_CHANNEL_NAME,

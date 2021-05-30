@@ -1,70 +1,11 @@
-import {
-  EComponentMode,
-  TComponentEntity,
-} from "src/render/services/editor/type.d";
 import * as types from "@babel/types";
-import { inject, injectable } from "src/base/service-manager";
-import CodeGeneraterService from "./CodeGeneraterService";
-import {
-  ComponentEntityService,
-  ComponentHandlerService,
-} from "src/render/services";
-import { MAIN_CONTAINER } from "src/base/const";
+import { injectable } from "src/base/service-manager";
 
 /** 语法树生成器 */
-@injectable("ASTGeneraterService", {
-  isPreposition: true,
-})
-class ASTGeneraterService {
-  @inject("CodeGeneraterService") codeGeneraterService: CodeGeneraterService;
-  @inject("ComponentHandlerService")
-  componentHandlerService: ComponentHandlerService;
-  @inject("ComponentEntityService")
-  componentEntityService: ComponentEntityService;
-
-  _constructor() {
-    this.componentEntityService.$componentEntityMap.subscribe((entityMap) => {
-      const ast = this.transformToAST(entityMap[MAIN_CONTAINER]);
-      const code = this.codeGeneraterService.transformToCode(ast);
-      console.log(
-        "taozhizhu ~🚀 file: ASTGeneraterService.ts ~🚀 line 29 ~🚀 ASTGeneraterService ~🚀 this.componentEntityService.$componentEntityMap.subscribe ~🚀 code",
-        code
-      );
-    });
-  }
-
-  /** 组件实例转AST */
-  transformToAST(
-    componentEntity: TComponentEntity<EComponentMode>
-  ): types.JSXElement {
-    const { tag, mode, attrNode, childNode } = componentEntity;
-    const { styles = [] } = attrNode;
-
-    const attributes = [];
-    if (styles.length) {
-      const style =
-        this.componentHandlerService.stylesAttrItemToStyleProp(styles);
-      const styleAttribute = this._createJSXAttribute("style", style);
-      attributes.push(styleAttribute);
-    }
-
-    let children = [];
-    if (mode === EComponentMode.content) {
-      const jsxText = this._createJSXText(childNode as string);
-      children.push(jsxText);
-    } else if (mode === EComponentMode.container) {
-      children = (childNode as string[]).map((childId) => {
-        const childEntity =
-          this.componentEntityService.getComponentEntityById(childId);
-        return this.transformToAST(childEntity);
-      });
-    }
-
-    return this._createJSXElement(tag, attributes, children);
-  }
-
+@injectable("NodeGeneratorService")
+class NodeGeneratorService {
   /** 创建JSX节点 */
-  private _createJSXElement(
+  createJSXElement(
     tag: string,
     attributes: (types.JSXAttribute | types.JSXSpreadAttribute)[] = [],
     children: (
@@ -98,7 +39,7 @@ class ASTGeneraterService {
   }
 
   /** 创建jsx属性 */
-  private _createJSXAttribute(name: string, value: any): types.JSXAttribute {
+  createJSXAttribute(name: string, value: any): types.JSXAttribute {
     const jsxIdentifier = this._createJSXIdentifier(name);
 
     let valueNode = null;
@@ -112,7 +53,7 @@ class ASTGeneraterService {
   }
 
   /** 创建ReactNode的文本 */
-  private _createJSXText(value: string): types.JSXText {
+  createJSXText(value: string): types.JSXText {
     return types.jSXText(value);
   }
 
@@ -208,4 +149,4 @@ class ASTGeneraterService {
   }
 }
 
-export default ASTGeneraterService;
+export default NodeGeneratorService;

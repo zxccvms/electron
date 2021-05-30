@@ -7,7 +7,7 @@ import {
 import style from "./index.less";
 
 interface IModelItemProps {
-  componentModel: TComponentModel<EComponentMode>;
+  componentModel: TComponentModel;
 }
 
 const ModelItem: React.FC<IModelItemProps> = (props) => {

@@ -19,3 +19,12 @@ declare const loggerService: {
   warn: (...content: any[]) => void;
   info: (...content: any[]) => void;
 };
+/** 过滤类型 */
+type Filter<U, T> = {
+  [P in keyof U]: U[P] extends T ? P : never;
+}[keyof U];
+
+/** Partial的升级版 递归所有结构 */
+type PartialPlus<T> = {
+  [P in keyof Partial<T>]: PartialPlus<T[P]>;
+};

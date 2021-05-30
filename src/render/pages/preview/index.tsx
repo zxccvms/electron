@@ -1,17 +1,24 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { MAIN_CONTAINER } from "src/base/const";
-import { EWindowName } from "src/base/const/type.d";
+import { EWindowName } from "src/base/const/types.d";
 import { If } from "src/base/react-helper/judge";
 import useObservable from "src/base/react-helper/useObservable";
 import { TRemoteService, useService } from "src/base/service-manager";
-import { ComponentEntityService } from "src/render/services";
+import { ComponentManagerService } from "src/render/services";
 import Entity from "./Entity";
 
-const componentEntityService = useService<
-  TRemoteService<ComponentEntityService>
->("ComponentEntityService", EWindowName.Main);
+const componentManagerService = useService<
+  TRemoteService<ComponentManagerService>
+>("ComponentManagerService", EWindowName.Main);
 
 const Preview = (props) => {
+  const { filePath } = props;
+
+  const componentEntityService = useMemo(
+    () => componentManagerService.getComponentEntityService(filePath),
+    [filePath]
+  );
+
   const componentEntityMap = useObservable(
     componentEntityService.$componentEntityMap,
     {
